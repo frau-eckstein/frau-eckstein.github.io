@@ -1,1 +1,0 @@
-# GitHub Pages frau-eckstein
