@@ -512,7 +512,7 @@ td.best { color: var(--lime); font-weight: 500; }
 .comp-table td.td-con { color: var(--pink); }
 
 /* glossary */
-.glossary { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+.glossary { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; letter-spacing: .5px }
 .gloss-item {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--r); padding: 13px 16px;
@@ -728,56 +728,7 @@ td.best { color: var(--lime); font-weight: 500; }
               <div class="fc-desc">Alle Verarbeitungsschritte abgeschlossen. Wartet auf Freigabe der Ressourcen durch das Betriebssystem.</div>
             </div>
           </div>
-        </div>
-
-        <!-- Strategy comparison -->
-        <div class="theory-h2">Schnellvergleich der Strategien</div>
-        <table class="comp-table">
-          <thead><tr>
-            <th>Strategie</th>
-            <th>Art</th>
-            <th>Entscheidungskriterium</th>
-            <th>Stärke</th>
-            <th>Schwäche</th>
-          </tr></thead>
-          <tbody>
-            <tr>
-              <td><span class="ct-name">FCFS</span><span class="ct-full">First Come First Served</span></td>
-              <td><span class="pill pill-np">non-preemptive</span></td>
-              <td style="color:var(--text)">Ankunftsreihenfolge</td>
-              <td class="td-pro">Einfach, kein Overhead</td>
-              <td class="td-con">Konvoi-Effekt, hohe Wartezeiten</td>
-            </tr>
-            <tr>
-              <td><span class="ct-name">Round Robin</span><span class="ct-full">RR</span></td>
-              <td><span class="pill pill-p">preemptive</span></td>
-              <td style="color:var(--text)">Festes Zeitfenster (Quantum)</td>
-              <td class="td-pro">Faire Verteilung, kein Verhungern</td>
-              <td class="td-con">Kontextwechsel-Overhead, Quantum-Wahl kritisch</td>
-            </tr>
-            <tr>
-              <td><span class="ct-name">SJF</span><span class="ct-full">Shortest Job First</span></td>
-              <td><span class="pill pill-np">non-preemptive</span></td>
-              <td style="color:var(--text)">Kürzeste Gesamtlaufzeit</td>
-              <td class="td-pro">Minimale Ø-Wartezeit</td>
-              <td class="td-con">Starvation, Laufzeit oft unbekannt</td>
-            </tr>
-            <tr>
-              <td><span class="ct-name">SRTF</span><span class="ct-full">Shortest Remaining Time First</span></td>
-              <td><span class="pill pill-p">preemptive</span></td>
-              <td style="color:var(--text)">Kürzeste Restlaufzeit</td>
-              <td class="td-pro">Optimal für Ø-Wartezeit</td>
-              <td class="td-con">Hoher Overhead, Restzeit muss bekannt sein</td>
-            </tr>
-            <tr>
-              <td><span class="ct-name">Priority Scheduling</span><span class="ct-full">PS</span></td>
-              <td><span class="pill pill-both">non-p. &amp; p.</span></td>
-              <td style="color:var(--text)">Prioritätswert (1 = höchste)</td>
-              <td class="td-pro">Wichtige Tasks bevorzugbar</td>
-              <td class="td-con">Starvation niedriger Prioritäten (→ Aging)</td>
-            </tr>
-          </tbody>
-        </table>
+        </div>        
 
         <!-- Glossary -->
         <div class="theory-h2">Wichtige Begriffe</div>
@@ -812,11 +763,7 @@ td.best { color: var(--lime); font-weight: 500; }
           </div>
           <div class="gloss-item">
             <div class="gloss-term">Starvation</div>
-            <div class="gloss-def"><strong>Verhungern</strong> (Starvation) tritt auf, wenn ein Prozess so lange wartet, dass er nie oder erst sehr spät ausgeführt wird – z. B. weil ständig Prozesse mit höherer Priorität nachkommen.</div>
-          </div>
-          <div class="gloss-item">
-            <div class="gloss-term">Aging</div>
-            <div class="gloss-def">Lösung für das Starvation-Problem: Die <strong>Priorität</strong> eines wartenden Prozesses wird mit der Zeit automatisch erhöht, sodass er irgendwann sicher ausgeführt wird.</div>
+            <div class="gloss-def"><strong>Verhungern</strong> (Starvation) tritt auf, wenn ein Prozess so lange wartet, dass er nie oder erst sehr spät ausgeführt wird.</div>
           </div>
           <div class="gloss-item">
             <div class="gloss-term">Quantum (RR)</div>
