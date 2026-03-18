@@ -307,13 +307,14 @@ header {
 }
 
 .stats-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 10px; margin-bottom: 28px;
 }
 .stat-card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--r); padding: 14px 16px;
   position: relative; overflow: hidden; transition: border-color .2s;
+  min-width: 180px;
 }
 .stat-card:hover { border-color: var(--border2); }
 .stat-card::after {
