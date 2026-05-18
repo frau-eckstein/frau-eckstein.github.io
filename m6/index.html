@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy"
+  content="default-src 'self';
+            style-src 'self' 'unsafe-inline';
+            font-src 'self';
+            script-src 'none';
+            img-src 'self' data:;">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prozentrechnung – Interaktives Arbeitsblatt</title>
+<style>
+  @font-face {
+    font-family: 'Nunito';
+    src: url('fonts/Nunito-VariableFont_wght.woff2') format('woff2');
+    font-weight: 400 900;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Fredoka One';
+    src: url('fonts/Fredoka-VariableFont_wdth,wght.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --bg: #f5f0e8;
+    --card: #ffffff;
+    --ink: #1a1a2e;
+    --muted: #6b6b8a;
+    --accent-orange: #fb8500;
+    --accent-pink: #e63946;
+    --accent-purple: #832161;
+    --yellow: #cca000;
+    --col-pw: #cca000;
+    --col-gw: #007197;
+    --col-ps: #832161;
+    --col-pw-light: #fff0c0;
+    --col-gw-light: #c0e8f5;
+    --col-ps-light: #f5c8e8;
+    --shadow: 0 4px 0 #1a1a2e;
+    --radius: 14px;
+    --fs-min: 1rem;
+    --fs-sm:  1.05rem;
+    --fs-lg:  1.35rem;
+    --fs-xl:  1.55rem;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--fs-min);
+    line-height: 1.55;
+    background: var(--bg);
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+    color: var(--ink);
+  }
+
+  /* ── HEADER ── */
+  .page-header { text-align: center; margin-bottom: 36px; }
+  .page-header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    color: var(--ink); letter-spacing: 1px; line-height: 1.1;
+  }
+  .page-header .subtitle {
+    margin-top: 8px; font-size: var(--fs-sm); color: var(--muted); font-weight: 600;
+  }
+  .badge {
+    display: inline-block; background: var(--col-pw-light);
+    border: 2.5px solid var(--col-pw); border-radius: 999px;
+    padding: 4px 16px; font-size: var(--fs-min); font-weight: 800;
+    margin-bottom: 10px; box-shadow: 2px 2px 0 var(--ink); color: var(--ink);
+  }
+
+  /* ── SECTIONS ── */
+  .formula-section { max-width: 860px; margin: 0 auto 40px; }
+  .examples-section { max-width: 860px; margin: 0 auto; }
+  .quiz-section { max-width: 860px; margin: 40px auto 0; }
+
+  .section-title {
+    font-family: 'Fredoka One', cursive; font-size: var(--fs-xl);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-title .num {
+    background: var(--ink); color: white;
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: var(--fs-min); flex-shrink: 0;
+  }
+
+  /* ── TRIANGLE CONTAINER ── */
+  .triangle-container {
+    background: var(--card); border: 3px solid var(--ink);
+    border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 28px 24px 24px;
+    display: flex; flex-direction: column; align-items: center; gap: 24px;
+  }
+
+  /*
+   * Das Zauberdreieck wird als SVG gezeichnet.
+   * Maße: viewBox 0 0 340 230
+   * Dreieck-Außenpunkte (Mittelpunkte der Zellen):
+   *   Oben:        (170,  18)  → Zelle 130×60 zentriert: x=110, y=8
+   *   Unten-links: ( 20, 162)  → Zelle 130×60: x=0, y=152
+   *   Unten-rechts:(320, 162)  → Zelle 130×60: x=190, y=152
+   * Trennlinie horizontal: y=152 (Oberkante der unteren Zellen)
+   * Trennlinie vertikal: x=170, von y=152 bis y=212
+   */
+  .magic-triangle-wrap {
+    width: 340px; flex-shrink: 0;
+  }
+  .magic-triangle-wrap svg { width: 100%; height: auto; overflow: visible; }
+
+  /* ── FORMULA CARDS ── */
+  .formula-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+    gap: 14px; width: 100%;
+  }
+  .formula-card {
+    border: 2.5px solid var(--ink); border-radius: 12px;
+    padding: 16px 18px; box-shadow: 3px 3px 0 var(--ink); transition: transform .15s;
+  }
+  .formula-card:hover { transform: translateY(-2px); }
+  .formula-card.seek-pw { background: var(--col-pw-light); }
+  .formula-card.seek-gw { background: var(--col-gw-light); }
+  .formula-card.seek-ps { background: var(--col-ps-light); }
+
+  .card-title {
+    font-weight: 800; font-size: var(--fs-min);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    margin-bottom: 10px; opacity: 0.8;
+  }
+  .card-formula {
+    font-family: 'Fredoka One', cursive; font-size: var(--fs-xl);
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+  .frac {
+    display: inline-flex; flex-direction: column; align-items: center;
+    vertical-align: middle; font-size: var(--fs-lg);
+    font-family: 'Fredoka One', cursive; margin: 0 4px;
+  }
+  .frac .num-f { border-bottom: 2.5px solid var(--ink); padding: 0 4px 3px; line-height: 1; }
+  .frac .den-f { padding: 3px 4px 0; line-height: 1; }
+  .eq-sign { font-size: var(--fs-xl); }
+  .card-note { font-size: var(--fs-min); color: var(--muted); margin-top: 8px; font-weight: 600; }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    margin-top: 18px; font-size: var(--fs-min); font-weight: 700;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 7px;
+    padding: 6px 14px; border: 2px solid var(--ink);
+    border-radius: 999px; background: white; box-shadow: 2px 2px 0 var(--ink);
+  }
+  .leg-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--ink); flex-shrink: 0; }
+
+  .tri-hint { font-weight: 700; margin-bottom: 14px; font-size: var(--fs-min); color: var(--muted); }
+
+  /* ── HINT BOX ── */
+  .hint-box {
+    background: #fff8dc; border: 2.5px dashed var(--yellow);
+    border-radius: 12px; padding: 16px 20px;
+    margin: 18px auto 36px; font-size: var(--fs-sm);
+    font-weight: 600; color: #514000; max-width: 860px;
+  }
+  .hint-box strong { color: var(--ink); }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 8px; margin-bottom: -3px; flex-wrap: wrap; }
+  .tab-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: var(--fs-min);
+    padding: 10px 20px; border: 2.5px solid var(--ink); border-bottom: none;
+    border-radius: 10px 10px 0 0; cursor: pointer; background: #ddd; color: var(--ink);
+    transition: background .15s;
+  }
+  .tab-btn.active-pw { background: var(--col-pw-light); color: var(--ink); }
+  .tab-btn.active-gw { background: var(--col-gw-light); color: var(--ink); }
+  .tab-btn.active-ps { background: var(--col-ps-light); color: var(--ink); }
+
+  .tab-content {
+    display: none; border: 2.5px solid var(--ink);
+    border-radius: 0 var(--radius) var(--radius) var(--radius);
+    box-shadow: var(--shadow); padding: 26px;
+  }
+  .tab-content.active { display: block; }
+  .tab-content.bg-pw { background: #fff8e0; }
+  .tab-content.bg-gw { background: #e0f4f9; }
+  .tab-content.bg-ps { background: #f9e0f2; }
+
+  /* ── STEPS ── */
+  .example-header { font-family: 'Fredoka One', cursive; font-size: var(--fs-xl); margin-bottom: 14px; }
+  .task-text {
+    background: white; border: 2px solid var(--ink); border-radius: 10px;
+    padding: 14px 18px; font-size: var(--fs-sm); font-weight: 700;
+    margin-bottom: 22px; box-shadow: 2px 2px 0 var(--ink); line-height: 1.6;
+  }
+  .steps { display: flex; flex-direction: column; gap: 13px; }
+  .step {
+    display: flex; gap: 14px; align-items: flex-start;
+    opacity: 0; transform: translateY(10px);
+    transition: opacity .4s, transform .4s;
+  }
+  .step.visible { opacity: 1; transform: none; }
+  .step-num {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: white;
+    font-weight: 800; font-size: var(--fs-min);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+  }
+  .step-body {
+    background: white; border: 2px solid var(--ink); border-radius: 10px;
+    padding: 12px 16px; flex: 1; font-size: var(--fs-sm); font-weight: 600;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .formula-line {
+    font-family: 'Fredoka One', cursive; font-size: var(--fs-xl);
+    margin-top: 5px; color: var(--ink);
+  }
+  .result-line {
+    font-family: 'Fredoka One', cursive; font-size: var(--fs-xl);
+    color: var(--col-gw); margin-top: 5px;
+  }
+  .show-btn {
+    margin-top: 18px; font-family: 'Nunito', sans-serif; font-weight: 800;
+    font-size: var(--fs-sm); padding: 11px 26px; background: var(--ink); color: white;
+    border: none; border-radius: 10px; cursor: pointer;
+    box-shadow: 3px 3px 0 #555; transition: transform .1s, box-shadow .1s;
+  }
+  .show-btn:hover  { transform: translateY(-1px); box-shadow: 3px 5px 0 #555; }
+  .show-btn:active { transform: translateY(1px);  box-shadow: 1px 2px 0 #555; }
+  .show-btn:disabled { opacity: 0.5; cursor: default; }
+
+  /* ── QUIZ ── */
+  .quiz-card {
+    background: var(--card); border: 3px solid var(--ink);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px;
+  }
+  .quiz-question { font-weight: 700; font-size: var(--fs-sm); margin-bottom: 16px; line-height: 1.6; }
+  .quiz-question .highlight { background: #fff0c0; padding: 2px 7px; border-radius: 5px; font-weight: 800; }
+  .quiz-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-bottom: 16px; }
+  @media(max-width: 480px) { .quiz-choices { grid-template-columns: 1fr; } }
+  .choice-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: var(--fs-min);
+    padding: 11px 14px; border: 2.5px solid var(--ink); border-radius: 10px;
+    background: white; cursor: pointer; text-align: left;
+    box-shadow: 2px 2px 0 var(--ink); transition: background .15s, transform .1s; line-height: 1.45;
+  }
+  .choice-btn:hover:not(:disabled) { background: #f0f0ff; transform: translateY(-1px); }
+  .choice-btn:disabled { cursor: default; }
+  .choice-btn.correct { background: #b8f5da; border-color: #06d6a0; }
+  .choice-btn.wrong   { background: #ffd0d4; border-color: var(--accent-pink); }
+  .quiz-feedback {
+    padding: 12px 16px; border-radius: 10px; font-weight: 700;
+    font-size: var(--fs-min); display: none; margin-bottom: 14px; line-height: 1.5;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok  { background: #b8f5da; border: 2px solid #06d6a0; }
+  .quiz-feedback.nok { background: #ffd0d4; border: 2px solid var(--accent-pink); }
+  .quiz-nav { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .quiz-progress { font-weight: 700; font-size: var(--fs-min); color: var(--muted); margin-left: auto; }
+  .score-display { text-align: center; padding: 22px; font-family: 'Fredoka One', cursive; font-size: var(--fs-xl); }
+
+  .var-PW { color: var(--col-pw); font-weight: 900; }
+  .var-GW { color: var(--col-gw); font-weight: 900; }
+  .var-PS { color: var(--col-ps); font-weight: 900; }
+  .var-search { background: #fff0c0; border-radius: 4px; padding: 1px 6px; }
+
+  @media(max-width: 600px) {
+    .formula-cards { grid-template-columns: 1fr; }
+    .magic-triangle-wrap { width: 280px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="page-header">
+  <div class="badge">📐 Mathematik · Klasse 6</div>
+  <h1>Die Grundgleichung<br>der Prozentrechnung</h1>
+  <p class="subtitle">Formeln verstehen &amp; anwenden</p>
+</div>
+
+<!-- ════════════════════════════════════
+     1 · ZAUBERDREIECK + FORMELN
+═════════════════════════════════════ -->
+<div class="formula-section">
+  <div class="section-title">
+    <span class="num">1</span>
+    Das Zauberdreieck der Prozentrechnung
+  </div>
+
+  <div class="triangle-container">
+
+    <!--
+      SVG-Zauberdreieck  (viewBox 340 × 240)
+      ───────────────────────────────────────
+      Zellen: je 120 × 64 px, Ecken abgerundet (rx 10)
+        PW  oben:         x=110, y=4    → Mitte (170, 36)
+        GW  unten-links:  x=4,   y=162  → Mitte (64,  194)
+        PS  unten-rechts: x=216, y=162  → Mitte (276, 194)
+
+      Trennlinie horizontal: y=162 (Oberkante Unterzellen), x: 4 → 336
+      Trennlinie vertikal:   x=170, y=162 → y=226
+
+      Operatoren:
+        · links  bei (~85,  200)   – zwischen GW und PS (links der Linie)
+        · rechts bei (~255, 200)   – zwischen GW und PS (rechts)  NEIN
+        Eigentlich: GW · PS = PW
+          ·  steht links von der Vertikalen  → Mitte links (~92, 198)
+          :  steht links oben (÷-Zone GW)   → (~30, 148)
+          :  steht rechts oben (÷-Zone PS)  → (~295, 148)
+    -->
+    <div style="width:100%; text-align: center;">
+      <img src="img/dreieck.png" style="width: 80%; min-width:300px;">
+    </div>
+    
+
+    <!-- Formel-Karten -->
+    <div style="width:100%">
+      <p class="tri-hint">
+        🔍 Decke die gesuchte Größe im Dreieck ab – die verbleibenden zeigen dir die Formel!
+      </p>
+      <div class="formula-cards">
+
+        <!-- PW gesucht -->
+        <div class="formula-card seek-pw">
+          <div class="card-title">Prozentwert PW gesucht</div>
+          <div style="width:100%; text-align: center;">
+            <img src="img/dreieck-pw.png" style="width: 100%;">
+          </div>
+          <div class="card-formula">
+            <span class="var-PW">PW</span>
+            <span class="eq-sign">=</span>
+            <span class="var-GW">GW</span>
+            <span>·</span>
+            <span class="var-PS">PS</span>
+          </div>          
+        </div>
+
+        <!-- GW gesucht -->
+        <div class="formula-card seek-gw">
+          <div class="card-title">Grundwert GW gesucht</div>
+          <div style="width:100%; text-align: center;">
+            <img src="img/dreieck-gw.png" style="width: 100%;">
+          </div>
+          <div class="card-formula">
+            <span class="var-GW">GW</span>
+            <span class="eq-sign">=</span>
+            <div class="frac">
+              <span class="num-f"><span class="var-PW">PW</span></span>
+              <span class="den-f"><span class="var-PS">PS</span></span>
+            </div>
+          </div>
+          <div class="card-note">= PW : PS</div>          
+        </div>
+
+        <!-- PS gesucht -->
+        <div class="formula-card seek-ps">
+          <div class="card-title">Prozentsatz PS gesucht</div>
+          <div style="width:100%; text-align: center;">
+            <img src="img/dreieck-ps.png" style="width: 100%;">
+          </div>
+          <div class="card-formula">
+            <span class="var-PS">PS</span>
+            <span class="eq-sign">=</span>
+            <div class="frac">
+              <span class="num-f"><span class="var-PW">PW</span></span>
+              <span class="den-f"><span class="var-GW">GW</span></span>
+            </div>
+          </div>
+          <div class="card-note">= PW : GW</div>          
+        </div>
+
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><div class="leg-dot" style="background:#fff0c0;border-color:#cca000"></div> PW = Prozentwert</div>
+        <div class="legend-item"><div class="leg-dot" style="background:#c0e8f5;border-color:#007197"></div> GW = Grundwert (= 100 %)</div>
+        <div class="legend-item"><div class="leg-dot" style="background:#f5c8e8;border-color:#832161"></div> PS = Prozentsatz (als Dezimalzahl)</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="hint-box">
+  💡 <strong>Merke:</strong><br>
+  Die Grundgleichung lautet immer: <strong>PW = GW · PS</strong>.
+  Alle anderen Formeln entstehen durch einfaches Umstellen dieser einen Gleichung.
+</div>
+
+<!-- ════════════════════════════════════
+     2 · SCHRITT-FÜR-SCHRITT BEISPIELE
+═════════════════════════════════════ -->
+<div class="examples-section">
+  <div class="section-title">
+    <span class="num">2</span>
+    Schritt-für-Schritt Beispiele
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active-pw" onclick="showTab('pw')">Prozentwert PW</button>
+    <button class="tab-btn active-gw" onclick="showTab('gw')">Grundwert GW</button>
+    <button class="tab-btn active-ps" onclick="showTab('ps')">Prozentsatz PS</button>
+  </div>
+
+  <!-- TAB PW -->
+  <div class="tab-content bg-pw active" id="tab-pw">
+    <div class="example-header">Beispiel: Prozentwert PW berechnen</div>
+    <div class="task-text">
+      In einer Klasse sind 30 Schülerinnen und Schüler. <strong>20%</strong> fahren mit dem Fahrrad zur Schule.<br>
+      <em>Ermittle, wie viele Kinder der Klasse mit dem Fahrrad zur Schule fahren.</em>
+    </div>
+    <div class="steps" id="steps-pw">
+      <div class="step" id="step-pw-1">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div>Bekannte Größen ablesen:</div>
+          <div class="formula-line">
+            <span class="var-GW">GW = 30</span> &nbsp;|&nbsp;
+            <span class="var-PS">PS = 20 % = 0,20</span> &nbsp;|&nbsp;
+            <span class="var-PW var-search">PW = ?</span>
+          </div>
+        </div>
+      </div>
+      <div class="step" id="step-pw-2">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div>Passende Formel aufschreiben:</div>
+          <div class="formula-line">
+            <span class="var-PW">PW</span> = <span class="var-GW">GW</span> · <span class="var-PS">PS</span>
+          </div>
+        </div>
+      </div>
+      <div class="step" id="step-pw-3">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div>Zahlen einsetzen:</div>
+          <div class="formula-line">
+            <span class="var-PW">PW</span> = <span class="var-GW">30</span> · <span class="var-PS">0,20</span>
+          </div>
+        </div>
+      </div>
+      <div class="step" id="step-pw-4">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div>Ausrechnen:</div>
+          <div class="result-line var-PW">PW = <strong>6 Kinder</strong> 🚲</div>
+        </div>
+      </div>
+    </div>
+    <button class="show-btn" id="btn-pw" onclick="revealSteps('pw')">▶ Schritt für Schritt zeigen</button>
+  </div>
+
+  <!-- TAB GW -->
+  <div class="tab-content bg-gw" id="tab-gw">
+    <div class="example-header">Beispiel: Grundwert GW berechnen</div>
+    <div class="task-text">
+      Im Supermarkt kostet ein Artikel nach einem Rabatt nur noch <strong>12 €</strong>.
+      Das sind <strong>75 %</strong> des ursprünglichen Preises.<br>
+      <em>Berechne, was der Artikel vor der Rabattierung gekostet hat.</em>
+    </div>
+    <div class="steps" id="steps-gw">
+      <div class="step" id="step-gw-1">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div>Bekannte Größen ablesen:</div>
+          <div class="formula-line">
+            <span class="var-PW">PW = 12 €</span> &nbsp;|&nbsp;
+            <span class="var-PS">PS = 75 % = 0,75</span> &nbsp;|&nbsp;
+            <span class="var-GW var-search">GW = ?</span>
+          </div>
+        </div>
+      </div>
+      <div class="step" id="step-gw-2">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div>Passende Formel aufschreiben:</div>
+          <div class="formula-line">
+            <span class="var-GW">GW</span> = <span class="var-PW">PW</span> : <span class="var-PS">PS</span>
+          </div>
+        </div>
+      </div>
+      <div class="step" id="step-gw-3">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div>Zahlen einsetzen:</div>
+          <div class="formula-line">
+            <span class="var-GW">GW</span> = <span class="var-PW">12</span> : <span class="var-PS">0,75</span>
+          </div>
+        </div>
+      </div>
+      <div class="step" id="step-gw-4">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div>Ausrechnen:</div>
+          <div class="result-line">GW = <strong>16 €</strong> 🛒</div>
+        </div>
+      </div>
+    </div>
+    <button class="show-btn" id="btn-gw" onclick="revealSteps('gw')">▶ Schritt für Schritt zeigen</button>
+  </div>
+
+  <!-- TAB PS -->
+  <div class="tab-content bg-ps" id="tab-ps">
+    <div class="example-header">Beispiel: Prozentsatz PS berechnen</div>
+    <div class="task-text">
+      Von <strong>200 Schülerinnen und Schülern</strong> einer Schule sind <strong>50</strong> in einem Sportverein.<br>
+      <em>Ermittle, wie hoch der Prozentsatz PS ist.</em>
+    </div>
+    <div class="steps" id="steps-ps">
+      <div class="step" id="step-ps-1">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div>Bekannte Größen ablesen:</div>
+          <div class="formula-line">
+            <span class="var-GW">GW = 200</span> &nbsp;|&nbsp;
+            <span class="var-PW">PW = 50</span> &nbsp;|&nbsp;
+            <span class="var-PS var-search">PS = ?</span>
+          </div>
+        </div>
+      </div>
+      <div class="step" id="step-ps-2">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div>Passende Formel aufschreiben:</div>
+          <div class="formula-line">
+            <span class="var-PS">PS</span> = <span class="var-PW">PW</span> : <span class="var-GW">GW</span>
+          </div>
+        </div>
+      </div>
+      <div class="step" id="step-ps-3">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div>Zahlen einsetzen:</div>
+          <div class="formula-line">
+            <span class="var-PS">PS</span> = <span class="var-PW">50</span> : <span class="var-GW">200</span>
+          </div>
+        </div>
+      </div>
+      <div class="step" id="step-ps-4">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div>Ausrechnen:</div>
+          <div class="result-line var-PS">PS = 0,25 = <strong>25 %</strong> 🏅</div>
+        </div>
+      </div>
+    </div>
+    <button class="show-btn" id="btn-ps" onclick="revealSteps('ps')">▶ Schritt für Schritt zeigen</button>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════
+     3 · QUIZ
+═════════════════════════════════════ -->
+<div class="quiz-section">
+  <div class="section-title">
+    <span class="num">3</span>
+    Teste dich! 🎯
+  </div>
+  <div class="quiz-card">
+    <div id="quiz-area"></div>
+  </div>
+</div>
+
+<script>
+// ── TABS ──
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  resetSteps(id);
+}
+
+// ── STEPS ──
+const stepState = { pw: 0, gw: 0, ps: 0 };
+
+function resetSteps(id) {
+  stepState[id] = 0;
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('step-' + id + '-' + i);
+    if (el) el.classList.remove('visible');
+  }
+  const btn = document.getElementById('btn-' + id);
+  if (btn) { btn.textContent = '▶ Schritt für Schritt zeigen'; btn.disabled = false; }
+}
+
+function revealSteps(id) {
+  stepState[id]++;
+  const n = stepState[id];
+  const el = document.getElementById('step-' + id + '-' + n);
+  if (el) setTimeout(() => el.classList.add('visible'), 50);
+  const btn = document.getElementById('btn-' + id);
+  if (n >= 4) { btn.textContent = '✅ Fertig!'; btn.disabled = true; }
+  else { btn.textContent = '▶ Nächster Schritt (' + n + '/4)'; }
+}
+
+// ── QUIZ ──
+const questions = [
+  {
+    text: 'Welche Formel brauchst du, wenn du den <span class="highlight">Prozentwert PW</span> suchst?',
+    choices: ['PW = GW · PS', 'GW = PW : PS', 'PS = PW : GW', 'PW = GW + PS'],
+    correct: 0,
+    feedback: '✅ Richtig! PW = GW · PS &nbsp;→&nbsp; z. B. 80 · 25 % = 80 · 0,25 = <strong>20</strong>'
+  },
+  {
+    text: 'Ein Pullover kostet nach Rabatt nur noch <span class="highlight">24 €</span> (= 80 % des ursprünglichen Preises). Welche Größe wird gesucht?',
+    choices: ['Prozentwert PW', 'Grundwert GW', 'Prozentsatz PS', 'Keine davon'],
+    correct: 1,
+    feedback: '✅ Richtig! Der ursprüngliche Preis ist der <strong>Grundwert GW</strong>. GW = 24 € : 80 % = 24 € : 0,80 = <strong>30 €</strong>'
+  },
+  {
+    text: 'Von 400 Schülerinnen und Schülern sind 60 krank. Welche Formel liefert den <span class="highlight">Prozentsatz PS</span>?',
+    choices: ['PS = GW · PW', 'PS = PW : GW', 'PS = GW : PW', 'PS = PW · GW'],
+    correct: 1,
+    feedback: '✅ Richtig! PS = PW : GW = 60 : 400 = <strong>0,15 (= 15 %)</strong>'
+  },
+  {
+    text: 'GW = 250, PS = 8 % – berechne den <span class="highlight">Prozentwert PW</span>.',
+    choices: ['PW = 15', 'PW = 20', 'PW = 2', 'PW = 3125'],
+    correct: 1,
+    feedback: '✅ Richtig! PW = 250 · 8 % = 250 · 0,08 = <strong>20</strong>'
+  },
+  {
+    text: 'PW = 35, PS = 7 % – berechne den <span class="highlight">Grundwert GW</span>.',
+    choices: ['GW = 4', 'GW = 500', 'GW = 2,45', 'GW = 42'],
+    correct: 1,
+    feedback: '✅ Richtig! GW = 35 : 7 % = 35 : 0,07 = <strong>500</strong>'
+  },
+  {
+    text: 'PW = 18, GW = 120 – berechne den <span class="highlight">Prozentsatz PS</span>.',
+    choices: ['PS = 15 %', 'PS = 20 %', 'PS = 6,67 %', 'PS = 102 %'],
+    correct: 0,
+    feedback: '✅ Richtig! PS = 18 : 120 = <strong>0,15 (= 15 %)</strong>'
+  }
+];
+
+let currentQ = 0, score = 0, answered = false;
+
+function renderQuestion() {
+  if (currentQ >= questions.length) { renderScore(); return; }
+  const q = questions[currentQ];
+  document.getElementById('quiz-area').innerHTML = `
+    <div class="quiz-question">Frage ${currentQ + 1} von ${questions.length}: ${q.text}</div>
+    <div class="quiz-choices">
+      ${q.choices.map((c, i) => `<button class="choice-btn" onclick="answer(${i})">${c}</button>`).join('')}
+    </div>
+    <div class="quiz-feedback" id="qfb"></div>
+    <div class="quiz-nav">
+      <button class="show-btn" id="next-btn" onclick="nextQ()" style="display:none">Nächste Frage →</button>
+      <div class="quiz-progress">Punkte: ${score} / ${currentQ} &nbsp;|&nbsp; Frage ${currentQ + 1}/${questions.length}</div>
+    </div>`;
+  answered = false;
+}
+
+function answer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[currentQ];
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(b => b.disabled = true);
+  btns[idx].classList.add(idx === q.correct ? 'correct' : 'wrong');
+  if (idx !== q.correct) btns[q.correct].classList.add('correct');
+  const fb = document.getElementById('qfb');
+  fb.classList.add('show');
+  if (idx === q.correct) { score++; fb.classList.add('ok');  fb.innerHTML = q.feedback; }
+  else                   {          fb.classList.add('nok'); fb.innerHTML = '❌ Leider falsch. ' + q.feedback; }
+  document.getElementById('next-btn').style.display = 'inline-block';
+  document.querySelector('.quiz-progress').textContent =
+    `Punkte: ${score} / ${currentQ + 1} | Frage ${currentQ + 1}/${questions.length}`;
+}
+
+function nextQ() { currentQ++; renderQuestion(); }
+
+function renderScore() {
+  const pct = Math.round(score / questions.length * 100);
+  const emoji = pct >= 80 ? '🏆' : pct >= 50 ? '👍' : '💪';
+  const msg   = pct >= 80 ? 'Hervorragend!' : pct >= 50 ? 'Gut gemacht!' : 'Weiter üben!';
+  document.getElementById('quiz-area').innerHTML = `
+    <div class="score-display">
+      <div style="font-size:3rem">${emoji}</div>
+      <div>${msg}</div>
+      <div style="font-size:1.1rem;color:var(--muted);font-family:'Nunito',sans-serif;font-weight:700;margin-top:10px">
+        Du hast <strong>${score} von ${questions.length} Fragen</strong> richtig beantwortet (${pct} %).
+      </div>
+      <button class="show-btn" style="margin-top:18px" onclick="restartQuiz()">🔄 Nochmal versuchen</button>
+    </div>`;
+}
+
+function restartQuiz() { currentQ = 0; score = 0; renderQuestion(); }
+renderQuestion();
+</script>
+</body>
+</html>
