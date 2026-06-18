@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manipulation mit Diagrammen</title>
+<style>
+  @font-face {
+    font-family: 'Nunito';
+    src: url('fonts/Nunito-VariableFont_wght.woff2') format('woff2');
+    font-weight: 400 900;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: 'Fredoka One';
+    src: url('fonts/Fredoka-VariableFont_wdth,wght.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --bg: #f5f0e8;
+    --card: #ffffff;
+    --ink: #1a1a2e;
+    --muted: #6b6b8a;
+    --shadow: 0 4px 0 #1a1a2e;
+    --radius: 14px;
+    --fs-min: 1rem;
+    --fs-sm:  1.05rem;
+    --fs-lg:  1.35rem;
+    --fs-xl:  1.55rem;
+
+    --col-axis: #007197;       --col-axis-light: #cdeefa;
+    --col-area: #3c7a1e;       --col-area-light: #e1f0c9;
+    --col-cherry: #c81d4f;     --col-cherry-light: #ffd9e3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+
+  body {
+    font-family: 'Nunito', 'Trebuchet MS', sans-serif;
+    font-size: var(--fs-min);
+    line-height: 1.55;
+    background: var(--bg);
+    min-height: 100vh;
+    padding: 24px 16px 56px;
+    color: var(--ink);
+  }
+
+  /* ── HEADER ── */
+  .page-header { text-align: center; margin-bottom: 36px; }
+  .page-header h1 {
+    font-family: 'Fredoka One', 'Trebuchet MS', cursive;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    color: var(--ink); letter-spacing: 1px; line-height: 1.1;
+  }
+  .page-header .subtitle {
+    margin-top: 8px; font-size: var(--fs-sm); color: var(--muted); font-weight: 700;
+  }
+  .badge {
+    display: inline-block; background: var(--col-axis-light);
+    border: 2.5px solid var(--col-axis); border-radius: 999px;
+    padding: 4px 16px; font-size: var(--fs-min); font-weight: 800;
+    margin-bottom: 10px; box-shadow: 2px 2px 0 var(--ink); color: var(--ink);
+  }
+
+  /* ── SECTIONS ── */
+  .examples-section { max-width: 880px; margin: 0 auto; }
+  .quiz-section { max-width: 880px; margin: 44px auto 0; }
+
+  .section-title {
+    font-family: 'Fredoka One', 'Trebuchet MS', cursive; font-size: var(--fs-xl);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-title .num {
+    background: var(--ink); color: white;
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: var(--fs-min); flex-shrink: 0;
+  }
+
+  /* ── HINT BOX ── */
+  .hint-box {
+    background: #fff8dc; border: 2.5px dashed #cca000;
+    border-radius: 12px; padding: 16px 20px;
+    margin: 0 auto 36px; font-size: var(--fs-sm);
+    font-weight: 600; color: #514000; max-width: 880px;
+  }
+  .hint-box strong { color: var(--ink); }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 8px; margin-bottom: -3px; flex-wrap: wrap; }
+  .tab-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: var(--fs-min);
+    padding: 10px 18px; border: 2.5px solid var(--ink); border-bottom: none;
+    border-radius: 10px 10px 0 0; cursor: pointer; background: #ddd; color: var(--ink);
+    transition: background .15s;
+  }
+  .tab-btn.active-axis   { background: var(--col-axis-light); }
+  .tab-btn.active-area   { background: var(--col-area-light); }
+  .tab-btn.active-cherry { background: var(--col-cherry-light); }
+
+  .tab-content {
+    display: none; border: 2.5px solid var(--ink);
+    border-radius: 0 var(--radius) var(--radius) var(--radius);
+    box-shadow: var(--shadow); padding: 26px;
+  }
+  .tab-content.active { display: block; }
+  .tab-content.bg-axis   { background: #eaf8fd; }
+  .tab-content.bg-area   { background: #f1f8e4; }
+  .tab-content.bg-cherry { background: #fdeaf0; }
+
+  .example-header { font-family: 'Fredoka One', 'Trebuchet MS', cursive; font-size: var(--fs-xl); margin-bottom: 14px; }
+  .task-text {
+    background: white; border: 2px solid var(--ink); border-radius: 10px;
+    padding: 14px 18px; font-size: var(--fs-sm); font-weight: 700;
+    margin-bottom: 22px; box-shadow: 2px 2px 0 var(--ink); line-height: 1.6;
+  }
+
+  /* ── CHART CARD ── */
+  .chart-card {
+    background: var(--card); border: 3px solid var(--ink); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 24px 22px; margin-bottom: 18px;
+  }
+
+  /* ── TOGGLE BUTTONS & QUESTIONS ── */
+  .toggle-group { display: inline-flex; border: 2.5px solid var(--ink); border-radius: 10px; overflow: hidden; }
+  .toggle-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: var(--fs-min);
+    padding: 10px 20px; border: none; background: #fff; color: var(--ink);
+    cursor: pointer; transition: background .15s, color .15s;
+  }
+  .toggle-btn:not(:last-child) { border-right: 2.5px solid var(--ink); }
+  .toggle-btn[aria-pressed="true"] { background: var(--ink); color: #fff; }
+
+  .question-box {
+    background: #fff; border: 2px dashed var(--muted); border-radius: 10px;
+    padding: 12px 16px; font-weight: 700; font-size: var(--fs-sm);
+    margin: 14px 0; color: var(--ink); line-height: 1.55;
+  }
+  .compare-controls { margin-top: 4px; }
+
+  /* ── BALLS (Trick 2) ── */
+  .balls-row { display: flex; align-items: flex-end; justify-content: center; gap: 48px; min-height: 280px; padding-top: 20px; flex-wrap: wrap; }
+  .ball-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .ball { border: 3px solid var(--ink); border-radius: 50%; box-shadow: 3px 3px 0 var(--ink); transition: width .4s, height .4s; }
+  .ball-label { font-weight: 700; font-size: var(--fs-min); text-align: center; color: var(--ink); }
+
+  /* ── EXPLAIN PANEL ── */
+  .show-btn {
+    margin-top: 4px; font-family: 'Nunito', sans-serif; font-weight: 800;
+    font-size: var(--fs-sm); padding: 11px 26px; background: var(--ink); color: white;
+    border: none; border-radius: 10px; cursor: pointer;
+    box-shadow: 3px 3px 0 #555; transition: transform .1s, box-shadow .1s;
+  }
+  .show-btn:hover  { transform: translateY(-1px); box-shadow: 3px 5px 0 #555; }
+  .show-btn:active { transform: translateY(1px);  box-shadow: 1px 2px 0 #555; }
+  .show-btn:disabled { opacity: 0.6; cursor: default; }
+
+  .explain-panel {
+    opacity: 0; transform: translateY(8px); transition: opacity .4s, transform .4s;
+    margin-top: 18px; border: 2.5px solid var(--ink); border-radius: 12px;
+    padding: 16px 20px; font-weight: 600; font-size: var(--fs-sm);
+    box-shadow: 2px 2px 0 var(--ink); line-height: 1.65;
+  }
+  .explain-panel.visible { opacity: 1; transform: none; }
+  .explain-panel.bg-axis   { background: var(--col-axis-light); }
+  .explain-panel.bg-area   { background: var(--col-area-light); }
+  .explain-panel.bg-cherry { background: var(--col-cherry-light); }
+  .discuss { margin-top: 10px; font-style: italic; }
+
+  .reflect-box {
+    opacity: 0; transform: translateY(8px); transition: opacity .4s, transform .4s;
+    background: #fff8dc; border: 2.5px dashed #cca000; border-radius: 10px;
+    padding: 12px 16px; font-weight: 700; font-size: var(--fs-sm);
+    margin-top: 14px; color: var(--ink); line-height: 1.55;
+  }
+  .reflect-box.visible { opacity: 1; transform: none; }
+
+  /* ── QUIZ ── */
+  .quiz-card {
+    background: var(--card); border: 3px solid var(--ink);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px;
+  }
+  .quiz-question { font-weight: 700; font-size: var(--fs-sm); margin-bottom: 16px; line-height: 1.6; }
+  .quiz-question .highlight { background: #fff0c0; padding: 2px 7px; border-radius: 5px; font-weight: 800; }
+  .quiz-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-bottom: 16px; }
+  @media(max-width: 480px) { .quiz-choices { grid-template-columns: 1fr; } }
+  .choice-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: var(--fs-min);
+    padding: 11px 14px; border: 2.5px solid var(--ink); border-radius: 10px;
+    background: white; cursor: pointer; text-align: left;
+    box-shadow: 2px 2px 0 var(--ink); transition: background .15s, transform .1s; line-height: 1.45;
+  }
+  .choice-btn:hover:not(:disabled) { background: #f0f0ff; transform: translateY(-1px); }
+  .choice-btn:disabled { cursor: default; }
+  .choice-btn.correct { background: #b8f5da; border-color: #06d6a0; }
+  .choice-btn.wrong   { background: #ffd0d4; border-color: #e63946; }
+  .quiz-feedback {
+    padding: 12px 16px; border-radius: 10px; font-weight: 700;
+    font-size: var(--fs-min); display: none; margin-bottom: 14px; line-height: 1.5;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok  { background: #b8f5da; border: 2px solid #06d6a0; }
+  .quiz-feedback.nok { background: #ffd0d4; border: 2px solid #e63946; }
+  .quiz-nav { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .quiz-progress { font-weight: 700; font-size: var(--fs-min); color: var(--muted); margin-left: auto; }
+  .score-display { text-align: center; padding: 22px; font-family: 'Fredoka One', cursive; font-size: var(--fs-xl); }
+
+  .footer-note { max-width: 880px; margin: 36px auto 0; text-align: center; font-size: 0.85rem; color: var(--muted); font-weight: 600; }
+
+  @media(max-width: 600px) {
+    .balls-row { gap: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="page-header">
+  <div class="badge">Mathematik 6 · 8.2 Prozentrechnung in Diagrammen und Texten</div>
+  <h1>Daten und Diagramme</h1>
+  <p class="subtitle">Manipulation und wie du sie durchschaust</p>
+</div>
+
+<!-- ════════════════════════════════════
+     1 · DIE DREI TRICKS
+═════════════════════════════════════ -->
+<div class="examples-section">
+
+  <div class="tabs">
+    <button class="tab-btn active-axis" onclick="showTab('axis')">Beispiel 1</button>
+    <button class="tab-btn active-area" onclick="showTab('area')">Beispiel 2</button>
+    <button class="tab-btn active-cherry" onclick="showTab('cherry')">Beispiel 3</button>
+  </div>
+
+  <!-- TAB AXIS -->
+  <div class="tab-content bg-axis active" id="tab-axis">
+    <div class="example-header">Beispiel 1</div>
+    <div class="task-text">
+      Im Auftaktspiel der WM 2026 hatte <strong>Deutschland 65 % Ballbesitz</strong> und <strong>Curaçao 35 %</strong>.
+    </div>
+    <div class="chart-card">
+      <svg id="svg-axis" viewBox="0 0 640 250" style="width:100%; height:auto; overflow:visible;"></svg>
+    </div>
+    <div class="question-box">🤔 Betrachte das Diagramm genau: Wie wirkt der Unterschied zwischen den beiden Balken auf dich?</div>
+
+    <button class="show-btn" id="btn-compare-axis" onclick="revealCompare('axis')">🔍 Vergleich anzeigen</button>
+
+    <div class="compare-controls" id="compare-controls-axis" style="display:none; margin-top:2em; margin-bottom:2em;">
+      <div class="question-box">
+        🧐 Das Diagramm hat sich nun verändert und zeigt die Werte fair an. <br>
+        Schalte mit den Buttons zwischen der manipulierten und der fairen Ansicht um und beobachte was sich verändert. Welchen Eindruck vermittelt das Diagramm jetzt?</div>
+      <div class="toggle-group">
+        <button class="toggle-btn" id="tbtn-axis-manip" onclick="setState('axis', false)" aria-pressed="true">😬 Manipuliert</button>
+        <button class="toggle-btn" id="tbtn-axis-fair" onclick="setState('axis', true)" aria-pressed="false">✅ Fair</button>
+      </div>
+    </div>
+
+    <button class="show-btn" id="btn-explain-axis" onclick="revealExplain('axis')" style="display:none">👀 Trick aufdecken</button>
+    <div class="explain-panel bg-axis" id="explain-axis" style="margin-bottom:2em;">
+      <strong>So funktioniert der Trick:</strong> <br>
+      Weil die y-Achse nicht bei 0 %, sondern erst bei 20 % beginnt (und bei 70% statt 100% aufhört),
+      wirkt der Wert von Curaçao im Vergleich deutlich kleiner. Tatsächlich liegen zwischen 65 % und 35 % aber nur <strong>30 Prozentpunkte</strong> Unterschied.
+      <div class="discuss">Diskutiert: Warum verwenden manche Medien trotzdem solche Diagramme?</div>
+    </div>   
+  </div>
+
+  <!-- TAB AREA -->
+  <div class="tab-content bg-area" id="tab-area">
+    <div class="example-header">Beispiel 2</div>
+    <div class="task-text">
+      Bei der WM 2026 ist der geschätzte Kaderwert von <strong>Portugal (≈ 1.000 Mio. €)</strong> etwa
+      <strong>4-mal so hoch</strong> wie der von <strong>Japan (≈ 250 Mio. €)</strong>.
+    </div>
+    <div class="chart-card">
+      <div class="balls-row">
+        <div class="ball-col">
+          <div class="ball" id="ball-small" style="width:60px; height:60px; background:var(--col-area)"></div>
+          <span class="ball-label">Japan<br>≈ 250 Mio. €</span>
+        </div>
+        <div class="ball-col">
+          <div class="ball" id="ball-big" style="width:240px; height:240px; background:var(--col-area)"></div>
+          <span class="ball-label">Portugal<br>≈ 1.000 Mio. €</span>
+        </div>
+      </div>
+    </div>
+    <div class="question-box">🤔 Untersuche das Diagramm: Um welchen Faktor hat sich der rechte im Vergleich zum linken Kreis vergrößert?</div>
+
+    <button class="show-btn" id="btn-compare-area" onclick="revealCompare('area')">🔍 Vergleich anzeigen</button>
+
+    <div class="compare-controls" id="compare-controls-area" style="display:none; margin-top:2em; margin-bottom:2em;">
+      <div class="question-box">🧐 Schalte um und beobachte, wie sich das Diagramm verändert.</div>
+      <div class="toggle-group">
+        <button class="toggle-btn" id="tbtn-area-manip" onclick="setState('area', false)" aria-pressed="true">😬 Manipuliert</button>
+        <button class="toggle-btn" id="tbtn-area-fair" onclick="setState('area', true)" aria-pressed="false">✅ Fair</button>
+      </div>      
+    </div>
+
+    <button class="show-btn" id="btn-explain-area" onclick="revealExplain('area')" style="display:none">👀 Trick aufdecken</button>
+    <div class="explain-panel bg-area" id="explain-area">
+      <strong>So funktioniert der Trick:</strong> <br>
+      Ein Kreis mit doppeltem Durchmesser hat nicht die doppelte, sondern die <strong>vierfache Fläche</strong>. <br>
+      Wird also der Durchmesser direkt mit dem gegebenen Faktor (hier: 4) vergrößert, wirkt der Größenunterschied dadurch viel dramatischer, 
+      als er wirklich ist. Fair ist es stattdessen, die <strong>Fläche</strong> mit dem gegebenen Faktor zu vergrößern.
+    </div>
+  </div>
+
+  <!-- TAB CHERRY -->
+  <div class="tab-content bg-cherry" id="tab-cherry">
+    <div class="example-header">Beispiel 3</div>
+    <div class="task-text">
+      Hier siehst du, wie viele Tore pro Spiel bei vergangenen Weltmeisterschaften im Schnitt gefallen sind.
+    </div>
+    <div class="chart-card">
+      <svg id="svg-cherry" viewBox="0 0 640 250" style="width:100%; height:auto; overflow:visible;"></svg>
+    </div>
+    <div class="question-box">🤔 Analysiere das Liniendiagramm: Welchen Trend siehst du? Was würdest du daraus schließen?</div>
+
+    <button class="show-btn" id="btn-compare-cherry" onclick="revealCompare('cherry')">🔍 Vergleich anzeigen</button>
+
+    <div class="compare-controls" id="compare-controls-cherry" style="display:none; margin-top:2em; margin-bottom:2em;">
+      <div class="question-box">🧐 Prüfe, was sich verändert hat. Ist dein erster Eindruck noch derselbe?</div>
+      <div class="toggle-group">
+        <button class="toggle-btn" id="tbtn-cherry-manip" onclick="setState('cherry', false)" aria-pressed="true">😬 Manipuliert</button>
+        <button class="toggle-btn" id="tbtn-cherry-fair" onclick="setState('cherry', true)" aria-pressed="false">✅ Fair</button>
+      </div>      
+    </div>
+
+    <button class="show-btn" id="btn-explain-cherry" onclick="revealExplain('cherry')" style="display:none">👀 Trick aufdecken</button>
+    <div class="explain-panel bg-cherry" id="explain-cherry">
+      <strong>So funktioniert der Trick:</strong> <br>
+      Wer nur die Jahre 1990, 2010 und 2022 zeigt, suggeriert einen gleichmäßigen Anstieg, also "Die WM wird immer torreicher!".<br>
+      Schaut man sich <strong>alle</strong> Turniere seit 1990 an, erkennt man, dass 1994 und 1998 ähnlich torreich waren.
+      Es ist also kein gerader Trend, sondern ein Auf und Ab.      
+    </div>
+  </div>
+</div>
+
+<div class="hint-box" style="margin-top:3em;">
+  💡 <strong>Merke:</strong> 
+  <br>
+  In Diagrammen kann der gleiche Datensatz ganz unterschiedlich dargestellt werden. 
+  Dabei ändern sich nie die Zahlen, aber der Eindruck.
+</div>
+
+
+<script>
+// ── TABS ──
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  resetStage(id);
+}
+
+function resetStage(id) {
+  // Stufe 1: nur das manipulierte Diagramm zeigen, Vergleich noch verborgen
+  document.getElementById('compare-controls-' + id).style.display = 'none';
+  const cbtn = document.getElementById('btn-compare-' + id);
+  cbtn.style.display = 'inline-block';
+  cbtn.disabled = false;
+  cbtn.textContent = '🔍 Vergleich anzeigen';
+
+  const ebtn = document.getElementById('btn-explain-' + id);
+  ebtn.style.display = 'none';
+  ebtn.textContent = '👀 Trick aufdecken';
+  ebtn.disabled = false;
+
+  document.getElementById('explain-' + id).classList.remove('visible');
+
+  const rbtn = document.getElementById('btn-reflect-' + id);
+  rbtn.style.display = 'none';
+  rbtn.textContent = '💭 Was lernen wir daraus?';
+  rbtn.disabled = false;
+
+  document.getElementById('reflect-' + id).classList.remove('visible');
+
+  setState(id, false);
+}
+
+function revealCompare(id) {
+  // Stufe 2: Umschalt-Buttons freigeben und direkt die faire Ansicht zum Vergleich zeigen
+  document.getElementById('compare-controls-' + id).style.display = 'block';
+  document.getElementById('btn-compare-' + id).style.display = 'none';
+  document.getElementById('btn-explain-' + id).style.display = 'inline-block';
+  setState(id, true);
+}
+
+function setState(id, fair) {
+  if (id === 'axis')   renderAxis(fair);
+  if (id === 'area')   setBallSize(fair);
+  if (id === 'cherry') renderCherry(fair);
+
+  const manipBtn = document.getElementById('tbtn-' + id + '-manip');
+  const fairBtn  = document.getElementById('tbtn-' + id + '-fair');
+  if (manipBtn) manipBtn.setAttribute('aria-pressed', fair ? 'false' : 'true');
+  if (fairBtn)  fairBtn.setAttribute('aria-pressed', fair ? 'true' : 'false');
+}
+
+function revealExplain(id) {
+  // Stufe 3: vollständige Erklärung des Tricks
+  document.getElementById('explain-' + id).classList.add('visible');
+  const btn = document.getElementById('btn-explain-' + id);
+  btn.textContent = '✅ Aufgedeckt!';
+  btn.disabled = true;
+  document.getElementById('btn-reflect-' + id).style.display = 'inline-block';
+}
+
+// ── TRICK 1: ACHSE ──
+function axisTicks(min, max) {
+  const step = (max - min) / 5;
+  const ticks = [];
+  for (let i = 0; i <= 5; i++) ticks.push(Math.round(min + step * i));
+  return ticks;
+}
+
+function renderAxis(fair) {
+  const min = fair ? 0 : 20, max = fair ? 100 : 70;
+  const top = 20, bottom = 190, left = 70, right = 590;
+  const ticks = axisTicks(min, max);
+
+  let gridSvg = '';
+  ticks.forEach(t => {
+    const y = bottom - (t - min) / (max - min) * (bottom - top);
+    gridSvg += '<line x1="' + left + '" y1="' + y + '" x2="' + right + '" y2="' + y + '" stroke="#00000018" stroke-width="1"/>';
+    gridSvg += '<text x="' + (left - 10) + '" y="' + (y + 4) + '" text-anchor="end" font-size="13" font-family="Nunito, sans-serif" fill="#6b6b8a">' + t + ' %</text>';
+  });
+
+  const data = [
+    { label: 'Deutschland', value: 65, color: '#007197', cx: 220 },
+    { label: 'Curaçao',     value: 35, color: '#c81d4f', cx: 430 }
+  ];
+  let barsSvg = '';
+  data.forEach(d => {
+    const y = bottom - (d.value - min) / (max - min) * (bottom - top);
+    const h = bottom - y;
+    barsSvg += '<rect x="' + (d.cx - 70) + '" y="' + y + '" width="140" height="' + h + '" rx="8" fill="' + d.color + '"/>';
+    barsSvg += '<text x="' + d.cx + '" y="' + (y - 12) + '" text-anchor="middle" font-weight="800" font-size="17" font-family="Nunito, sans-serif" fill="#1a1a2e">' + d.value + ' %</text>';
+    barsSvg += '<text x="' + d.cx + '" y="' + (bottom + 26) + '" text-anchor="middle" font-weight="700" font-size="14" font-family="Nunito, sans-serif" fill="#1a1a2e">' + d.label + '</text>';
+  });
+
+  const axisLine = '<line x1="' + left + '" y1="' + bottom + '" x2="' + right + '" y2="' + bottom + '" stroke="#1a1a2e" stroke-width="2"/>';
+  document.getElementById('svg-axis').innerHTML = gridSvg + barsSvg + axisLine;
+}
+
+// ── TRICK 2: BILDGRÖSSE ──
+function setBallSize(fair) {
+  const big = document.getElementById('ball-big');
+  big.style.width = fair ? '120px' : '240px';
+  big.style.height = fair ? '120px' : '240px';
+}
+
+// ── TRICK 3: ROSINENPICKEN ──
+const fullYears   = ['1990', '1994', '1998', '2002', '2006', '2010', '2014', '2018', '2022'];
+const fullGoals    = [2.21, 2.71, 2.67, 2.52, 2.30, 2.27, 2.67, 2.64, 2.69];
+const cherryYears = ['1990', '2010', '2022'];
+const cherryGoals  = [2.21, 2.27, 2.69];
+
+function renderCherry(fair) {
+  const years = fair ? fullYears : cherryYears;
+  const goals = fair ? fullGoals : cherryGoals;
+  const min = 2, max = 3, top = 20, bottom = 190, left = 70, right = 590;
+  const ticks = [2.0, 2.2, 2.4, 2.6, 2.8, 3.0];
+
+  let gridSvg = '';
+  ticks.forEach(t => {
+    const y = bottom - (t - min) / (max - min) * (bottom - top);
+    gridSvg += '<line x1="' + left + '" y1="' + y + '" x2="' + right + '" y2="' + y + '" stroke="#00000018" stroke-width="1"/>';
+    gridSvg += '<text x="' + (left - 10) + '" y="' + (y + 4) + '" text-anchor="end" font-size="12" font-family="Nunito, sans-serif" fill="#6b6b8a">' + t.toFixed(1) + '</text>';
+  });
+
+  const n = years.length;
+  const stepX = (right - left) / (n - 1);
+  const points = years.map((y, i) => {
+    const x = left + stepX * i;
+    const val = goals[i];
+    const py = bottom - (val - min) / (max - min) * (bottom - top);
+    return { x: x, y: py, label: y, val: val };
+  });
+
+  let pathD = '';
+  points.forEach((p, i) => { pathD += (i === 0 ? 'M' : 'L') + p.x + ' ' + p.y + ' '; });
+  const pathSvg = '<path d="' + pathD + '" fill="none" stroke="#c81d4f" stroke-width="3"/>';
+
+  let dotsSvg = '';
+  points.forEach(p => {
+    dotsSvg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="6" fill="#c81d4f" stroke="#1a1a2e" stroke-width="2"/>';
+    dotsSvg += '<text x="' + p.x + '" y="' + (p.y - 14) + '" text-anchor="middle" font-size="12" font-weight="700" font-family="Nunito, sans-serif" fill="#1a1a2e">' + p.val.toFixed(2) + '</text>';
+    dotsSvg += '<text x="' + p.x + '" y="' + (bottom + 24) + '" text-anchor="middle" font-size="13" font-weight="700" font-family="Nunito, sans-serif" fill="#1a1a2e">' + p.label + '</text>';
+  });
+
+  const axisLine = '<line x1="' + left + '" y1="' + bottom + '" x2="' + right + '" y2="' + bottom + '" stroke="#1a1a2e" stroke-width="2"/>';
+  document.getElementById('svg-cherry').innerHTML = gridSvg + pathSvg + dotsSvg + axisLine;
+}
+
+// ── INITIAL RENDER ──
+renderAxis(false);
+renderCherry(false);
+</script>
+</body>
+</html>
