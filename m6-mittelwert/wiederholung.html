@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wiederholung</title>
+<style>
+  :root {
+    --color-primary: #007197;
+    --color-secondary-dark: #001835;
+    --color-secondary-teal: #469085;
+    --color-secondary-light: #e4f4f1;
+    --color-text: #333333;
+    --color-bg-light: #f2f3fa;
+    --color-bg-grey: #e0e0e0;
+    --color-note: #cca000;
+    --color-note-light: #faf0cc;
+    --color-warning: #d09683;
+    --color-warning-light: #ffd8cc;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--color-bg-light);
+    color:var(--color-text);
+    font-family:'Segoe UI', Arial, sans-serif;
+    padding:40px 24px 60px;
+  }
+  h1{
+    text-align:center;
+    color:var(--color-primary);
+    font-size:2.2rem;
+    margin:0 0 34px;
+    letter-spacing:0.5px;
+  }
+  h1::after{
+    content:"";
+    display:block;
+    width:64px; height:4px;
+    background:var(--color-primary);
+    margin:14px auto 0;
+    border-radius:2px;
+  }
+  .wrap{ max-width:960px; margin:0 auto; }
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    grid-template-rows:repeat(2, auto);
+    gap:20px;
+  }
+  .flip-card{ perspective:1200px; height:230px; cursor:pointer; }
+  @media(max-width:700px){
+    .card-grid{ grid-template-columns:1fr; }
+  }
+  .flip-inner{
+    position:relative; width:100%; height:100%;
+    transition:transform 0.55s cubic-bezier(.4,.2,.2,1);
+    transform-style:preserve-3d;
+  }
+  .flip-card.is-flipped .flip-inner{ transform:rotateY(180deg); }
+  .face{
+    position:absolute; inset:0; backface-visibility:hidden;
+    border-radius:12px; padding:16px; display:flex; flex-direction:column;
+  }
+  .face.front{
+    background:#ffffff;
+    border:2px solid var(--color-secondary-teal);
+  }
+  .face.front .badge{
+    align-self:flex-start;
+    background:var(--color-secondary-teal); color:#ffffff;
+    font-size:0.78rem; font-weight:700;
+    padding:3px 10px; border-radius:999px; letter-spacing:0.5px; text-transform:uppercase;
+  }
+  .face.front .ctx{ font-weight:700; margin:10px 0 6px; font-size:1.05rem; color:var(--color-secondary-dark); }
+  .face.front .data{ font-size:0.96rem; color:var(--color-text); line-height:1.5; flex:1; }
+  .face.front .q{
+    font-size:1.02rem; font-weight:700; color:var(--color-primary);
+    border-top:1px dashed var(--color-bg-grey); padding-top:8px;
+  }
+  .face.back{
+    background:var(--color-secondary-dark); color:#ffffff;
+    transform:rotateY(180deg);
+    align-items:center; justify-content:center; text-align:center; gap:6px;
+  }
+  .face.back .ans{ font-size:1.85rem; font-weight:800; color:var(--color-note); }
+  .face.back small{ color:var(--color-secondary-light); font-size:0.9rem; }
+  .flip-hint{
+    text-align:center; color:var(--color-text); font-size:0.94rem;
+    margin-top:18px; font-style:italic; opacity:0.75;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Wiederholung</h1>
+
+    <div class="card-grid">
+
+      <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
+        <div class="flip-inner">
+          <div class="face front">
+            <span class="badge">Umfrage</span>
+            <div class="ctx">Lieblingshaustier (24 Kinder)</div>
+            <div class="data">Hund: 10 &nbsp;|&nbsp; Katze: 6 <br>Kaninchen: 4 &nbsp;|&nbsp; Sonstige: 4</div>
+            <div class="q">Absolute Häufigkeit von „Hund“?</div>
+          </div>
+          <div class="face back">
+            <div class="ans">10</div>
+            <small>10 von 24 Kindern nannten „Hund“</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
+        <div class="flip-inner">
+          <div class="face front">
+            <span class="badge">Umfrage</span>
+            <div class="ctx">Lieblingshaustier (24 Kinder)</div>
+            <div class="data">Hund: 10 &nbsp;|&nbsp; Katze: 6 <br>Kaninchen: 4 &nbsp;|&nbsp; Sonstige: 4</div>
+            <div class="q">Relative Häufigkeit von „Katze“?</div>
+          </div>
+          <div class="face back">
+            <div class="ans">25 %</div>
+            <small>6 : 24 = 1/4 = 25 %</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
+        <div class="flip-inner">
+          <div class="face front">
+            <span class="badge">Zufallsversuch</span>
+            <div class="ctx">Würfelversuch (20 Würfe)</div>
+            <div class="data">Die „6“ erschien 5-mal.</div>
+            <div class="q">Relative Häufigkeit der „6“?</div>
+          </div>
+          <div class="face back">
+            <div class="ans">25 %</div>
+            <small>5 : 20 = 1/4 = 25 %</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
+        <div class="flip-inner">
+          <div class="face front">
+            <span class="badge">WM-Tipprunde</span>
+            <div class="ctx">30 Kinder tippen den Weltmeister</div>
+            <div class="data">Brasilien: 12 &nbsp;|&nbsp; Argentinien: 9<br>Deutschland: 6 &nbsp;|&nbsp; Sonstige: 3</div>
+            <div class="q">Absolute Häufigkeit „Sonstige“?</div>
+          </div>
+          <div class="face back">
+            <div class="ans">3</div>
+            <small>3 von 30 Kindern tippten anders</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
+        <div class="flip-inner">
+          <div class="face front">
+            <span class="badge">WM-Tipprunde</span>
+            <div class="ctx">30 Kinder tippen den Weltmeister</div>
+            <div class="data">Brasilien: 12 &nbsp;|&nbsp; Argentinien: 9<br>Deutschland: 6 &nbsp;|&nbsp; Sonstige: 3</div>
+            <div class="q">Relative Häufigkeit „Deutschland“?</div>
+          </div>
+          <div class="face back">
+            <div class="ans">20 %</div>
+            <small>6 : 30 = 1/5 = 20 %</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card" onclick="this.classList.toggle('is-flipped')">
+        <div class="flip-inner">
+          <div class="face front">
+            <span class="badge">Verständnis</span>
+            <div class="ctx">Fachbegriff</div>
+            <div class="data">&nbsp;</div>
+            <div class="q">Was ist der Unterschied zwischen absoluter und relativer Häufigkeit?</div>
+          </div>
+          <div class="face back">
+            <div class="ans" style="font-size:1.2rem;">Anteil vs. Anzahl</div>
+            <small>Absolut = reine Anzahl · Relativ = Anteil am Ganzen (z. B. als Bruch/%)</small>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <p class="flip-hint">Klick auf eine Karte zum Umdrehen ↻</p>
+  </div>
+</body>
+</html>
