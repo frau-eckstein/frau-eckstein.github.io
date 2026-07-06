@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stunde 2 – Unsere Klasse in Zahlen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-primary: #007197;
+    --color-secondary-dark: #001835;
+    --color-secondary-teal: #469085;
+    --color-secondary-light: #e4f4f1;
+    --color-text: #333333;
+    --color-bg-light: #f2f3fa;
+    --color-bg-grey: #e0e0e0;
+    --color-note: #cca000;
+    --color-note-light: #faf0cc;
+    --color-warning: #d09683;
+    --color-warning-light: #ffd8cc;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--color-bg-light);
+    color:var(--color-text);
+    font-family:'Segoe UI', Arial, sans-serif;
+    padding:0 0 60px;
+  }
+  .hero{
+    background:var(--color-secondary-dark);
+    color:#ffffff;
+    text-align:center;
+    padding:38px 24px 28px;
+  }
+  .hero .eyebrow{
+    display:inline-block;
+    background:var(--color-note);
+    color:var(--color-secondary-dark);
+    font-weight:700; font-size:0.8rem; letter-spacing:1.5px; text-transform:uppercase;
+    padding:5px 14px; border-radius:999px; margin-bottom:12px;
+  }
+  h1, h2.task-title, .subtask h3{
+    font-family:'Nunito', 'Segoe UI', Arial, sans-serif;
+  }
+  .hero h1{ margin:0; font-size:1.9rem; }
+
+  .wrap{ max-width:940px; margin:0 auto; padding:0 24px; }
+
+  /* ---------- EXCEL-ABC LEGENDE ---------- */
+  .abc{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:12px;
+    margin:-22px auto 28px; max-width:940px; padding:0 24px;
+  }
+  .abc-item{
+    background:#ffffff; border-radius:12px; padding:14px 16px;
+    box-shadow:0 4px 10px rgba(0,24,53,0.1);
+    display:flex; align-items:center; gap:10px; font-size:0.95rem;
+    width:280px;
+  }
+  .abc-item .ico{ font-size:1.4rem; flex-shrink:0; }
+  .abc-item b{ color:var(--color-secondary-dark); }
+
+  /* ---------- TABS ---------- */
+  .tabs{
+    display:flex; gap:8px; margin:0 auto 0; max-width:940px;
+    border-bottom:3px solid var(--color-bg-grey);
+  }
+  .tab-btn{
+    flex:1;
+    background:none; border:none; cursor:pointer;
+    padding:14px 10px;
+    font-size:1.05rem; font-weight:700; color:#888;
+    border-bottom:3px solid transparent; margin-bottom:-3px;
+    transition:color 0.2s ease;
+  }
+  .tab-btn.active{ color:var(--color-primary); border-bottom-color:var(--color-primary); }
+  .tab-btn .tab-num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:26px; height:26px; border-radius:50%;
+    background:var(--color-bg-grey); color:#fff; font-size:0.85rem; margin-right:6px;
+  }
+  .tab-btn.active .tab-num{ background:var(--color-primary); }
+
+  .tab-content{ display:none; padding-top:28px; }
+  .tab-content.active{ display:block; }
+
+  h2.task-title{ color:var(--color-secondary-dark); font-size:1.4rem; margin:0 0 6px; }
+  .task-intro{ font-size:1rem; margin:0 0 20px; color:#555; }
+
+  /* ---------- EXCEL MOCKUP ---------- */
+  .xl-window{
+    border-radius:10px; overflow:hidden;
+    border:1px solid #c9ccd1;
+    box-shadow:0 6px 18px rgba(0,0,0,0.12);
+    margin-bottom:22px;
+  }
+  .xl-bar{
+    background:#f3f4f6; border-bottom:1px solid #c9ccd1;
+    display:flex; align-items:center; gap:10px;
+    padding:8px 12px; font-family:'Consolas','Courier New',monospace; font-size:0.92rem;
+  }
+  .xl-bar .fx{ color:var(--color-primary); font-weight:700; font-style:italic; }
+  .xl-bar .formula-text{ color:var(--color-secondary-dark); font-weight:700; }
+  table.xl-grid{ border-collapse:collapse; width:100%; background:#fff; }
+  table.xl-grid th, table.xl-grid td{
+    border:1px solid #e2e5ea; padding:8px 10px; font-size:0.95rem; text-align:center;
+  }
+  table.xl-grid th{ background:#eef0f3; color:#555; font-weight:700; }
+  table.xl-grid td.rownum{ background:#eef0f3; color:#555; font-weight:700; width:36px; }
+  table.xl-grid td.name-col{ text-align:left; }
+  table.xl-grid td.hint{
+    text-align:left; color:var(--color-primary); font-weight:700; font-size:0.9rem;
+    border:none; background:transparent;
+  }
+  table.xl-grid tr.sum-row td{ background:var(--color-secondary-light); font-weight:700; }
+  table.xl-grid tr.mean-row td{ background:var(--color-note-light); font-weight:700; color:var(--color-secondary-dark); }
+  table.xl-grid td.active-cell{ outline:2px solid var(--color-primary); outline-offset:-2px; }
+  .formula-code{ font-family:'Consolas','Courier New',monospace; color:var(--color-secondary-dark); }
+
+  .steps{ counter-reset:step; list-style:none; padding:0; margin:0 0 22px; }
+  .steps li{
+    counter-increment:step;
+    position:relative;
+    padding:9px 0 9px 42px;
+    margin-bottom:4px;
+    font-size:0.97rem;
+  }
+  .steps li::before{
+    content: counter(step);
+    position:absolute; left:0; top:7px;
+    background:var(--color-secondary-teal); color:#fff;
+    width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:0.85rem;
+  }
+  .steps code, .task-intro code{
+    font-family:'Consolas','Courier New',monospace;
+    background:var(--color-note-light);
+    border:1px solid var(--color-note);
+    color:var(--color-secondary-dark);
+    padding:1px 7px; border-radius:6px; font-size:0.92rem;
+  }
+
+  .discuss-box{
+    background:var(--color-secondary-light);
+    border-left:4px solid var(--color-secondary-teal);
+    border-radius:0 10px 10px 0;
+    padding:14px 18px; margin-top:6px; font-size:0.96rem;
+  }
+  .discuss-box b{ color:var(--color-secondary-dark); }
+  .discuss-box ul{ margin:6px 0 0 20px; padding:0; }
+  .discuss-box li{ margin-bottom:5px; }
+
+  .warn-box{
+    background:var(--color-warning-light);
+    border-left:4px solid var(--color-warning);
+    border-radius:0 10px 10px 0;
+    padding:14px 18px; margin:18px 0; font-size:0.96rem;
+  }
+  .warn-box b{ color:#8a3d2a; }
+
+  .final-note{
+    background:var(--color-secondary-dark); color:#fff;
+    border-radius:14px; padding:20px 24px; margin:32px auto 0; max-width:940px;
+    font-size:0.98rem;
+  }
+  .final-note b{ color:var(--color-note); }
+
+  /* ---------- DIAGRAMME ---------- */
+  .reveal-btn{
+    display:block; margin:18px auto 4px;
+    background:var(--color-primary); color:#fff; border:none;
+    font-size:0.94rem; font-weight:700;
+    padding:10px 22px; border-radius:999px; cursor:pointer;
+  }
+  .reveal-btn:hover{ background:var(--color-secondary-dark); }
+
+  .chart-panel{
+    display:none; margin-top:16px;
+  }
+  .chart-panel.show{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  @media(max-width:640px){ .chart-panel.show{ grid-template-columns:1fr; } }
+
+  .chart-box{
+    background:#fff; border:1px solid var(--color-bg-grey); border-radius:12px;
+    padding:16px; text-align:center;
+  }
+  .chart-box .cap{ font-size:0.84rem; color:#666; margin-top:10px; }
+
+  .pie{
+    width:170px; height:170px; border-radius:50%; margin:0 auto;
+    border:1px solid var(--color-bg-grey);
+  }
+  .bars{
+    display:flex; align-items:flex-end; gap:6px; height:150px; justify-content:center; padding:0 4px;
+  }
+  .bars .bar{
+    width:18px; border-radius:4px 4px 0 0; position:relative;
+  }
+  .bars .bar span{
+    position:absolute; top:-18px; left:0; right:0; font-size:0.68rem; color:#666;
+  }
+  .legend{
+    display:flex; flex-wrap:wrap; gap:6px 12px; justify-content:center;
+    margin-top:12px; font-size:0.78rem; color:#555;
+  }
+  .legend .sw{ display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:4px; vertical-align:middle; }
+
+  .subtask{
+    border-top:1px dashed var(--color-bg-grey); margin-top:28px; padding-top:24px;
+  }
+  .subtask h3{ color:var(--color-secondary-dark); font-size:1.15rem; margin:0 0 4px; }
+
+  @media(max-width:640px){
+    table.xl-grid{ font-size:0.82rem; }
+    .tab-btn{ font-size:0.9rem; padding:12px 4px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <h1>Unsere Klasse in Zahlen</h1>
+    <p><br></p>
+  </div>
+
+  <div class="abc">
+    <div class="abc-item"><span class="ico">🔤</span><span><b>Spalten</b>: Buchstaben (A, B, C …)</span></div>
+    <div class="abc-item"><span class="ico">🔢</span><span><b>Zeilen</b>: Zahlen (1, 2, 3 …)</span></div>
+    <div class="abc-item"><span class="ico">📍</span><span>Zelle <b>B2</b>: Spalte B, Zeile 2</span></div>
+    <div class="abc-item"><span class="ico">🟰</span><span>Formeln beginnen mit <b>"="</b></span></div>
+    <div class="abc-item"><span class="ico">⏎</span><span>Eingabe mit <b>Enter</b> bestätigen</span></div>
+  </div>
+
+  <div class="wrap">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="zeigeTab(0)"><span class="tab-num">1</span>Körpergröße</button>
+      <button class="tab-btn" onclick="zeigeTab(1)"><span class="tab-num">2</span>Alter</button>
+      <button class="tab-btn" onclick="zeigeTab(2)"><span class="tab-num">3</span>Geburtsmonat</button>
+      <button class="tab-btn" onclick="zeigeTab(3)"><span class="tab-num">4</span>Diagramme</button>
+    </div>
+
+    <!-- ================= TAB 1 ================= -->
+    <div class="tab-content active" id="tab-0">
+      <h2 class="task-title">Wie groß ist unsere Klasse?</h2>
+      <p class="task-intro">Führe die folgenden Schritte nacheinander aus und lasse automatisch das arithmetische Mittel berechnen.</p>
+
+      <div class="discuss-box">
+        <b>Lies alle Arbeitsaufträge aufmerksam!</b>        
+      </div>
+
+      <ol class="steps" style="margin-top:1.5em;">
+        <li>Trage fortlaufende Schülernummern (1, 2, 3, …) in Spalte <b>A</b> ein.</li>
+        <li>Trage alle Körpergrößen (nur die Zahlenwerte in cm, ohne Einheit) in Spalte <b>B</b> ein.</li>
+        <li>Klicke in eine leere Zelle unterhalb der Werte.<br>
+          Berechne dort das arithmetische Mittel: <code>=SUMME(B2:B26)/25</code> (25 = Anzahl eurer Werte)</li>
+        <li>Passe den Zellbereich (<code>B2:B26</code>) und die Zahl 25 an die tatsächliche Anzahl der Werte und der Schüler:innen in eurer Klasse an.</li>
+        <li>Bestätige alles mit Enter. Du solltest nun erfolgreich die durchschnittliche Körpergröße berechnet haben! 🎉</li>
+      </ol>
+
+      <div class="xl-window">
+        <div class="xl-bar"><span class="fx">fx</span> <span class="formula-text">=SUMME(B2:B26)/25</span></div>
+        <table class="xl-grid">
+          <tr><th></th><th>A</th><th>B</th><th></th></tr>
+          <tr><td class="rownum">1</td><td class="name-col"><b>Nr.</b></td><td><b>Größe (cm)</b></td><td class="hint">← Überschriften</td></tr>
+          <tr><td class="rownum">2</td><td class="name-col">1</td><td>152</td><td class="hint">← Nummern &amp; Werte eintragen</td></tr>
+          <tr><td class="rownum">3</td><td class="name-col">2</td><td>148</td><td></td></tr>
+          <tr><td class="rownum">4</td><td class="name-col">3</td><td>155</td><td></td></tr>
+          <tr><td class="rownum">5</td><td class="name-col">4</td><td>150</td><td></td></tr>
+          <tr><td class="rownum">6</td><td class="name-col">…</td><td>…</td><td></td></tr>          
+          <tr class="mean-row"><td class="rownum">27</td><td class="name-col">Mittelwert</td><td class="active-cell formula-code">=SUMME(B2:B26)/25</td><td class="hint">← Das ist unser gesuchter Wert!</td></tr>
+        </table>
+      </div>
+
+      <div class="discuss-box">
+        <b>Vergleich:</b> Für 11–12-Jährige liegt der Durchschnitt laut Wachstumstabellen bei ca. 145–152 cm. Passt euer Ergebnis dazu?
+      </div>
+    </div>
+
+    <!-- ================= TAB 2 ================= -->
+    <div class="tab-content" id="tab-1">
+      <h2 class="task-title">Wie alt ist die Klasse im Schnitt?</h2>
+      <p class="task-intro">Gleiches Prinzip, neue Daten. Diesmal mit weniger Anleitung</p>
+
+      <ol class="steps">
+        <li>Ergänze das Alter (in Jahren) in Spalte <b>C</b>.</li>
+        <li>Berechne den Mittelwert genauso wie bei Aufgabe 1 mit <code>=SUMME(...)</code> und der Division durch eure Klassengröße.</li>
+      </ol>
+
+      <div class="xl-window">
+        <div class="xl-bar"><span class="fx">fx</span> <span class="formula-text">=SUMME(C2:C26)/25</span></div>
+        <table class="xl-grid">
+          <tr><th></th><th>A</th><th>B</th><th>C</th><th></th></tr>
+          <tr><td class="rownum">1</td><td class="name-col"><b>Nr.</b></td><td><b>Größe (cm)</b></td><td><b>Alter (in Jahren)</b></td><td></td></tr>
+          <tr><td class="rownum">2</td><td class="name-col">1</td><td>...</td><td>11</td><td></td></tr>
+          <tr><td class="rownum">3</td><td class="name-col">2</td><td>...</td><td>12</td><td></td></tr>
+          <tr><td class="rownum">4</td><td class="name-col">3</td><td>...</td><td>11</td><td></td></tr>
+          <tr><td class="rownum">5</td><td class="name-col">…</td><td>...</td><td>…</td><td></td></tr>
+          <tr class="mean-row"><td class="rownum">27</td><td class="name-col">Mittelwert</td><td>...</td><td class="active-cell formula-code">=SUMME(C2:C26)/25</td><td class="hint">← gesuchter Wert</td></tr>
+        </table>
+      </div>      
+    </div>
+
+    <!-- ================= TAB 3 ================= -->
+    <div class="tab-content" id="tab-2">
+      <h2 class="task-title">Geburtsmonate unserer Klasse</h2>
+
+      <ol class="steps">
+        <li>Trage die Nummer des Geburtsmonats (Januar = 1, Februar = 2, … Dezember = 12) in Spalte <b>D</b> ein.</li>
+        <li>Berechne den Mittelwert wieder wie gewohnt: <code>=SUMME(D2:D26)/25</code></li>
+      </ol>
+
+      <div class="xl-window">
+        <div class="xl-bar"><span class="fx">fx</span> <span class="formula-text">=SUMME(D2:D26)/25</span></div>
+        <table class="xl-grid">
+          <tr><th></th><th>A</th><th>...</th><th>D</th><th></th></tr>
+          <tr><td class="rownum">1</td><td class="name-col"><b>Nr.</b></td><td><b>...</b></td><td><b>Geburtsmonat (Nr.)</b></td><td></td></tr>
+          <tr><td class="rownum">2</td><td class="name-col">1</td><td>...</td><td>3</td><td class="hint">← März = 3</td></tr>
+          <tr><td class="rownum">3</td><td class="name-col">2</td><td>...</td><td>7</td><td></td></tr>
+          <tr><td class="rownum">4</td><td class="name-col">3</td><td>...</td><td>12</td><td></td></tr>
+          <tr><td class="rownum">5</td><td class="name-col">…</td><td>...</td><td>…</td><td></td></tr>
+          <tr class="mean-row"><td class="rownum">27</td><td class="name-col">Mittelwert</td><td>...</td><td class="active-cell formula-code">=SUMME(D2:D26)/25</td><td class="hint">← z. B. 6,3</td></tr>
+        </table>
+      </div>
+
+      <div class="warn-box">
+        <b>Zusatzfrage:</b> Was bedeutet das arithmetische Mittel, wie z. B. "Monat 6,3" überhaupt? Ist das genauso sinnvoll wie eine durchschnittliche Körpergröße?
+      </div>
+
+      <div class="discuss-box">
+        <b>Bundesweiter Vergleich:</b> Geburten verteilen sich nicht exakt gleich auf alle Monate. Der Februar liegt oft am unteren Ende.     
+      </div>
+    </div>
+
+    <!-- ================= TAB 4 ================= -->
+    <div class="tab-content" id="tab-3">
+      <h2 class="task-title">Häufigkeiten sichtbar machen: Diagramme</h2>     
+      <p class="task-intro">Ein Mittelwert ist nicht immer die beste Kennzahl. Manchmal zeigt ein Diagramm die Verteilung viel anschaulicher.</p>
+
+      <div class="subtask">
+        <h3>Wie verteilt sich das Alter?</h3>
+        <p class="task-intro">Der Mittelwert zeigt nur einen einzigen Wert. Ein Diagramm zeigt, wie die Altersgruppen tatsächlich verteilt sind.</p>
+
+        <ol class="steps">
+          <li>Erstelle ein neues Tabellenblatt:</li>    
+          <div class="xl-window">
+            <img src="excel_neuesBlatt.png" alt="Screenshot: Neues Tabellenblatt über das Plus-Symbol anlegen" style="width:100%; display:block;">
+            <div style="padding:8px 12px; font-size:0.82rem; color:#666; background:#f8f8f8; border-top:1px solid #e2e5ea;">Klicke auf das <b>"+"</b> rechts neben eurem Tabellenblatt (hier "Tabelle1"), um ein neues Arbeitsblatt zu erstellen.</div>
+          </div>                
+          <li>Zähle zunächst, wie viele Schüler:innen 11, 12 oder 13 Jahre alt sind.</li>
+          <li>Trage dann die Altersgruppen in Spalte <b>A</b> und die Anzahl der Schüler:innen je Altersgruppe in Spalte <b>B</b> ein.</li>
+          <li>Berechne die Gesamtsumme aller Schülerinnen und Schüler: <code>=SUMME(B2:B4)</code></li>
+          <li>Berechne in Zelle <b>C2</b> die relative Häufigkeit in %: <code>=(B2/$B$5)*100</code>.</li>
+          <li>Kopiere die Formel aus Zelle <b>C2</b> nach unten. </li>
+          <li>Markiere die Spalten A und B. Wähle <b>Einfügen &rarr; Säulendiagramm</b>.</li>
+          <li>Markiere Spalte A und C gemeinsam (mit gedrückter <b>STRG</b>-Taste). Wähle <b>Einfügen &rarr; Kreisdiagramm</b> (2D-Kreis).</li>
+        </ol>
+
+        <div class="xl-window">
+          <div class="xl-bar"><span class="fx">fx</span> <span class="formula-text">=(B2/$B$5)*100</span></div>
+          <table class="xl-grid">
+            <tr><th></th><th>A</th><th>B</th><th>C</th></tr>
+            <tr><td class="rownum">1</td><td class="name-col"><b>Alter</b></td><td><b>Häufigkeit</b></td><td><b>rel. Häufigkeit</b></td></tr>
+            <tr><td class="rownum">2</td><td class="name-col">11 Jahre</td><td>10</td><td class="active-cell formula-code">33,3 %</td></tr>
+            <tr><td class="rownum">3</td><td class="name-col">12 Jahre</td><td>18</td><td>60,0 %</td></tr>
+            <tr><td class="rownum">4</td><td class="name-col">13 Jahre</td><td>2</td><td>6,7 %</td></tr>
+            <tr class="sum-row"><td class="rownum">5</td><td class="name-col">Summe</td><td class="formula-code">=SUMME(B2:B4)</td><td>100 %</td></tr>
+          </table>
+        </div>
+
+        <button class="reveal-btn" onclick="document.getElementById('chartsAlter').classList.toggle('show')">📊 Beispiel-Diagramme anzeigen</button>
+        <div class="chart-panel" id="chartsAlter">
+          <div class="chart-box">
+            <div class="pie" style="background:conic-gradient(var(--color-primary) 0% 33.3%, var(--color-secondary-teal) 33.3% 93.3%, var(--color-note) 93.3% 100%);"></div>
+            <div class="legend">
+              <span><span class="sw" style="background:var(--color-primary);"></span>11 J.</span>
+              <span><span class="sw" style="background:var(--color-secondary-teal);"></span>12 J.</span>
+              <span><span class="sw" style="background:var(--color-note);"></span>13 J.</span>
+            </div>
+            <div class="cap">Kreisdiagramm</div>
+          </div>
+          <div class="chart-box">
+            <div class="bars">
+              <div class="bar" style="height:56%; background:var(--color-primary);"><span>10</span></div>
+              <div class="bar" style="height:100%; background:var(--color-secondary-teal);"><span>18</span></div>
+              <div class="bar" style="height:12%; background:var(--color-note);"><span>2</span></div>
+            </div>
+            <div class="cap">Säulendiagramm</div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="subtask">
+        <h3>🚀 Für Schnelle</h3>
+        <p class="task-intro">Lege eine weitere Häufigkeitstabelle zu den Geburtsmonaten an.<br>
+        Erstelle dazu wieder ein neues Tabellenblatt und orientiere dich an folgender Übersicht:</p>
+
+        <div class="xl-window">
+          <div class="xl-bar"><span class="fx">fx</span> <span class="formula-text">=(B9/$B$14)*100</span></div>
+          <table class="xl-grid">
+            <tr><th></th><th>A</th><th>B</th><th>C</th></tr>
+            <tr><td class="rownum">1</td><td class="name-col"><b>Monat</b></td><td><b>Häufigkeit</b></td><td><b>rel. Häufigkeit</b></td></tr>
+            <tr><td class="rownum">2</td><td class="name-col">Januar</td><td>3</td><td>10,0 %</td></tr>
+            <tr><td class="rownum">3</td><td class="name-col">Februar</td><td>2</td><td>6,7 %</td></tr>
+            <tr><td class="rownum">4</td><td class="name-col">März</td><td>4</td><td>13,3 %</td></tr>
+            <tr><td class="rownum">5</td><td class="name-col">…</td><td>…</td><td>…</td></tr>
+            <tr><td class="rownum">9</td><td class="name-col">August</td><td>6</td><td class="active-cell formula-code">20,0 %</td></tr>
+            <tr><td class="rownum">10</td><td class="name-col">…</td><td>…</td><td>…</td></tr>
+            <tr class="sum-row"><td class="rownum">14</td><td class="name-col">Summe</td><td class="formula-code">=SUMME(B2:B13)</td><td>100 %</td></tr>
+          </table>
+        </div>
+
+        <p class="task-intro">Visualisiere deine Werte erneut in einem Säulendiagramm und einem Kreisdiagramm.</p>        
+        </div>
+        
+      </div>
+    </div>
+    
+  </div>
+
+<script>
+function zeigeTab(index){
+  document.querySelectorAll('.tab-content').forEach((el, i) => {
+    el.classList.toggle('active', i === index);
+  });
+  document.querySelectorAll('.tab-btn').forEach((el, i) => {
+    el.classList.toggle('active', i === index);
+  });
+}
+</script>
+
+</body>
+</html>
