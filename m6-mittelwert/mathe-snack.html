@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Mathe-Snack: Häufigkeiten & Mittelwert</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-primary: #007197;
+    --color-secondary-dark: #001835;
+    --color-secondary-teal: #469085;
+    --color-secondary-light: #e4f4f1;
+    --color-text: #333333;
+    --color-bg-light: #f2f3fa;
+    --color-bg-grey: #e0e0e0;
+    --color-note: #cca000;
+    --color-note-light: #faf0cc;
+    --color-warning: #d09683;
+    --color-warning-light: #ffd8cc;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Nunito Sans', sans-serif;
+    color: var(--color-text);
+    background: linear-gradient(180deg, var(--color-secondary-dark) 0%, var(--color-secondary-dark) 140px, var(--color-bg-light) 140px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 12px;
+  }
+
+  .phone {
+    width: 100%;
+    max-width: 560px;
+    height: min(820px, 92vh);
+    background: var(--color-bg-light);
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,24,53,0.35);
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: var(--color-secondary-dark);
+    color: #fff;
+    padding: 18px 18px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--color-secondary-teal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .header-text .name {
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    line-height: 1.2;
+  }
+
+  .header-text .sub {
+    font-size: 12.5px;
+    opacity: 0.75;
+  }
+
+  .progress-track {
+    height: 5px;
+    background: var(--color-bg-grey);
+    flex-shrink: 0;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--color-secondary-teal);
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  #chat {
+    flex: 1;
+    min-height: 0;
+    padding: 18px 14px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .row {
+    display: flex;
+    animation: rise 0.35s ease;
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .row.bot { justify-content: flex-start; }
+  .row.user { justify-content: flex-end; }
+
+  .bubble {
+    max-width: 82%;
+    padding: 11px 14px;
+    border-radius: 16px;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .row.bot .bubble {
+    background: #fff;
+    border: 1px solid var(--color-bg-grey);
+    border-bottom-left-radius: 4px;
+  }
+
+  .row.user .bubble {
+    background: var(--color-primary);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+
+  .row.bot .bubble.feedback-correct {
+    background: var(--color-secondary-light);
+    border-color: var(--color-secondary-teal);
+  }
+
+  .row.bot .bubble.feedback-wrong {
+    background: var(--color-warning-light);
+    border-color: var(--color-warning);
+  }
+
+  .typing .bubble {
+    background: #fff;
+    border: 1px solid var(--color-bg-grey);
+    border-bottom-left-radius: 4px;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 14px 16px;
+  }
+  .typing span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--color-secondary-teal);
+    animation: blink 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%, 80%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
+
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 14px;
+  }
+  table.data th {
+    background: var(--color-primary);
+    color: #fff;
+    padding: 6px 8px;
+    text-align: left;
+  }
+  table.data td {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--color-bg-grey);
+  }
+  table.data tr:nth-child(even) td {
+    background: var(--color-secondary-light);
+  }
+
+  #options {
+    padding: 10px 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--color-bg-light);
+    border-top: 1px solid var(--color-bg-grey);
+    flex-shrink: 0;
+  }
+
+  .opt-btn {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 14.5px;
+    font-weight: 700;
+    padding: 11px 14px;
+    border-radius: 14px;
+    border: 2px solid var(--color-primary);
+    background: #fff;
+    color: var(--color-primary);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .opt-btn:hover:not(:disabled) {
+    background: var(--color-secondary-light);
+  }
+  .opt-btn:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+  .opt-btn.correct-pick {
+    background: var(--color-secondary-teal);
+    border-color: var(--color-secondary-teal);
+    color: #fff;
+    opacity: 1;
+  }
+  .opt-btn.wrong-pick {
+    background: var(--color-warning);
+    border-color: var(--color-warning);
+    color: #fff;
+    opacity: 1;
+  }
+
+  .next-btn {
+    align-self: flex-start;
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 10px 22px;
+    border-radius: 20px;
+    border: none;
+    background: var(--color-primary);
+    color: #fff;
+    cursor: pointer;
+  }
+  .next-btn:hover { background: var(--color-secondary-teal); }
+
+  .final {
+    text-align: center;
+    padding: 30px 20px;
+  }
+  .final .badge {
+    width: 84px; height: 84px;
+    border-radius: 50%;
+    background: var(--color-secondary-teal);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+    margin: 0 auto 14px;
+  }
+  .final h2 {
+    font-family: 'Baloo 2', sans-serif;
+    color: var(--color-secondary-dark);
+    margin: 6px 0;
+  }
+  .final .score {
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 32px;
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+  .final p { font-size: 14.5px; color: var(--color-text); }
+  .restart-btn {
+    margin-top: 16px;
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 11px 26px;
+    border-radius: 22px;
+    border: none;
+    background: var(--color-secondary-dark);
+    color: #fff;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <header>
+    <div class="avatar">🚲</div>
+    <div class="header-text">
+      <div class="name">Zoe</div>
+      <div class="sub">Mathe-Snack: Häufigkeiten & Mittelwert</div>
+    </div>
+  </header>
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div id="chat"></div>
+  <div id="options"></div>
+</div>
+
+<script src="mathe-snack-story-data.js"></script>
+<script>
+let stepIndex = 0;
+let score = 0;
+let quizCount = story.filter(s => s.type === 'quiz').length;
+let answeredCorrectlyFirstTry = {};
+
+const chat = document.getElementById('chat');
+const optionsBox = document.getElementById('options');
+const progressFill = document.getElementById('progressFill');
+
+function scrollDown() {
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// Berechnet den SHA-256-Hash eines Antworttexts (getrimmt, kleingeschrieben),
+// damit die richtige Antwort nicht im Klartext im Code stehen muss.
+async function sha256Hex(str) {
+  const data = new TextEncoder().encode(str.trim().toLowerCase());
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+// Keep the latest message visible whenever the chat content or the
+// options/answer bar changes size (e.g. answer buttons appearing/disappearing).
+const resizeObserver = new ResizeObserver(() => scrollDown());
+resizeObserver.observe(chat);
+resizeObserver.observe(optionsBox);
+
+function addBotBubble(html, extraClass) {
+  const row = document.createElement('div');
+  row.className = 'row bot';
+  row.innerHTML = `<div class="bubble ${extraClass || ''}">${html}</div>`;
+  chat.appendChild(row);
+  scrollDown();
+}
+
+function addUserBubble(text) {
+  const row = document.createElement('div');
+  row.className = 'row user';
+  row.innerHTML = `<div class="bubble">${text}</div>`;
+  chat.appendChild(row);
+  scrollDown();
+}
+
+function showTyping(callback, delay) {
+  const row = document.createElement('div');
+  row.className = 'row bot typing';
+  row.innerHTML = `<div class="bubble"><span></span><span></span><span></span></div>`;
+  chat.appendChild(row);
+  scrollDown();
+  setTimeout(() => {
+    row.remove();
+    callback();
+  }, delay || 700);
+}
+
+function updateProgress() {
+  const pct = Math.min(100, Math.round((stepIndex / story.length) * 100));
+  progressFill.style.width = pct + '%';
+}
+
+function renderStep() {
+  updateProgress();
+  optionsBox.innerHTML = '';
+
+  if (stepIndex >= story.length) {
+    renderFinal();
+    return;
+  }
+
+  const step = story[stepIndex];
+
+  showTyping(() => {
+    addBotBubble(step.text);
+
+    if (step.type === 'info') {
+      const btn = document.createElement('button');
+      btn.className = 'next-btn';
+      btn.textContent = 'Weiter →';
+      btn.onclick = () => {
+        optionsBox.innerHTML = '';
+        stepIndex++;
+        renderStep();
+      };
+      optionsBox.appendChild(btn);
+    } else if (step.type === 'quiz') {
+      let firstTry = true;
+      const btns = [];
+      step.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.textContent = opt;
+        btn.onclick = async () => {
+          btns.forEach(b => b.disabled = true);
+          addUserBubble(opt);
+          const hash = await sha256Hex(opt);
+          if (hash === step.correctHash) {
+            btn.classList.add('correct-pick');
+            if (firstTry && !answeredCorrectlyFirstTry[stepIndex]) {
+              score++;
+              answeredCorrectlyFirstTry[stepIndex] = true;
+            }
+            showTyping(() => {
+              addBotBubble(step.feedbackCorrect, 'feedback-correct');
+              const next = document.createElement('button');
+              next.className = 'next-btn';
+              next.textContent = 'Weiter →';
+              next.onclick = () => {
+                optionsBox.innerHTML = '';
+                stepIndex++;
+                renderStep();
+              };
+              optionsBox.innerHTML = '';
+              optionsBox.appendChild(next);
+            }, 600);
+          } else {
+            btn.classList.add('wrong-pick');
+            firstTry = false;
+            showTyping(() => {
+              addBotBubble(step.feedbackWrong, 'feedback-wrong');
+              btns.forEach(b => { if (!b.classList.contains('wrong-pick')) b.disabled = false; });
+            }, 600);
+          }
+        };
+        btns.push(btn);
+        optionsBox.appendChild(btn);
+      });
+    }
+  }, 550);
+}
+
+function renderFinal() {
+  chat.innerHTML = '';
+  optionsBox.innerHTML = '';
+  const pct = Math.round((score / quizCount) * 100);
+  let comment;
+  if (pct === 100) comment = "Perfekt: alles im ersten Versuch richtig! Du kennst dich mit Häufigkeiten und Mittelwert bestens aus. 🥳";
+  else if (pct >= 60) comment = "Gut gemacht! Schau dir die Aufgaben, die nicht sofort geklappt haben, nochmal im Heft an. 🎉";
+  else comment = "Kein Problem: Wiederhole die Begriffe absolute/relative Häufigkeit und arithmetisches Mittel nochmal in Ruhe und starte danach neu. 🦾";
+
+  const finalDiv = document.createElement('div');
+  finalDiv.className = 'final';
+  finalDiv.innerHTML = `
+    <div class="badge">🏁</div>
+    <h2>Snack geschafft!</h2>
+    <div class="score">${score} / ${quizCount}</div>
+    <p>Fragen im ersten Versuch richtig beantwortet.</p>
+    <p>${comment}</p>
+    <button class="restart-btn" id="restartBtn">Nochmal von vorn</button>
+  `;
+  chat.appendChild(finalDiv);
+  progressFill.style.width = '100%';
+
+  document.getElementById('restartBtn').onclick = () => {
+    stepIndex = 0;
+    score = 0;
+    answeredCorrectlyFirstTry = {};
+    chat.innerHTML = '';
+    renderStep();
+  };
+}
+
+renderStep();
+</script>
+
+</body>
+</html>
