@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Unsere Klasse in Zahlen</title>
+<title>Stunde 2 – Unsere Klasse in Zahlen (mit Vorlage-Datei)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -216,6 +216,65 @@
   }
   .subtask h3{ color:var(--color-secondary-dark); font-size:1.15rem; margin:0 0 4px; }
 
+  .bonus-box{
+    background:#fff; border:2px dashed var(--color-primary); border-radius:10px;
+    padding:14px 18px; margin-top:20px; font-size:0.95rem;
+  }
+  .bonus-box .tag{
+    display:inline-block; background:var(--color-primary); color:#fff;
+    font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;
+    padding:3px 10px; border-radius:999px; margin-bottom:8px;
+  }
+
+  /* ---------- STARTSEITE ---------- */
+  .preview-grid{
+    display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin:22px 0 30px;
+  }
+  .preview-chip{
+    background:#fff; border:1px solid var(--color-bg-grey); border-radius:12px;
+    padding:16px 18px; text-align:center; width:190px;
+    box-shadow:0 4px 10px rgba(0,24,53,0.06);
+  }
+  .preview-chip .emoji{ font-size:1.8rem; display:block; margin-bottom:6px; }
+  .preview-chip .lbl{ font-weight:700; color:var(--color-secondary-dark); font-size:0.95rem; }
+
+  .xl-startscreen{
+    background:#f3f4f6; border:1px solid #c9ccd1; border-radius:10px;
+    padding:28px; text-align:center; margin-bottom:22px;
+  }
+  .xl-startscreen .tile{
+    display:inline-block; background:#fff; border:2px solid var(--color-secondary-teal);
+    border-radius:8px; padding:20px 30px; font-weight:700; color:var(--color-secondary-dark);
+    box-shadow:0 4px 10px rgba(0,0,0,0.08);
+  }
+  .xl-startscreen .tile .plus-ico{
+    font-size:2rem; display:block; margin-bottom:6px; color:var(--color-secondary-teal);
+  }
+  .start-cta{
+    display:block; text-align:center; margin-top:8px;
+    background:var(--color-primary); color:#fff; border:none;
+    font-size:1rem; font-weight:700; padding:12px 28px; border-radius:999px; cursor:pointer;
+  }
+  .start-cta:hover{ background:var(--color-secondary-dark); }
+
+  .download-link{
+    display:inline-flex; align-items:center; gap:8px;
+    background:#fff; color:var(--color-primary); border:2px solid var(--color-primary);
+    font-size:0.95rem; font-weight:700; text-decoration:none;
+    padding:10px 22px; border-radius:999px; margin:4px 0 18px;
+    transition:background 0.15s ease, color 0.15s ease;
+  }
+  .download-link:hover{ background:var(--color-primary); color:#fff; }
+
+  .sheet-tabs-mock{
+    display:flex; gap:2px; background:#1b1b1b; border-radius:0 0 8px 8px;
+    padding:6px 10px; margin:-4px 0 22px; width:fit-content;
+  }
+  .sheet-tabs-mock .st{
+    padding:6px 16px; font-size:0.85rem; color:#ccc; background:#2b2b2b; border-radius:4px 4px 0 0;
+  }
+  .sheet-tabs-mock .st.active{ background:#fff; color:var(--color-secondary-dark); font-weight:700; }
+
   @media(max-width:640px){
     table.xl-grid{ font-size:0.82rem; }
     .tab-btn{ font-size:0.9rem; padding:12px 4px; }
@@ -230,8 +289,8 @@
   </div>
 
   <div class="abc">
-    <div class="abc-item"><span class="ico">🔤</span><span><b>Spalten</b>: Buchstaben (A, B, C …)</span></div>
-    <div class="abc-item"><span class="ico">🔢</span><span><b>Zeilen</b>: Zahlen (1, 2, 3 …)</span></div>
+    <div class="abc-item"><span class="ico">🔤</span><span><b>Spalten</b>: Buchstaben (A, B …)</span></div>
+    <div class="abc-item"><span class="ico">🔢</span><span><b>Zeilen</b>: Zahlen (1, 2 …)</span></div>
     <div class="abc-item"><span class="ico">📍</span><span>Zelle <b>B2</b>: Spalte B, Zeile 2</span></div>
     <div class="abc-item"><span class="ico">🟰</span><span>Formeln beginnen mit <b>"="</b></span></div>
     <div class="abc-item"><span class="ico">⏎</span><span>Eingabe mit <b>Enter</b> bestätigen</span></div>
@@ -239,185 +298,218 @@
 
   <div class="wrap">
     <div class="tabs">
-      <button class="tab-btn active" onclick="zeigeTab(0)"><span class="tab-num">1</span>Körpergröße</button>
-      <button class="tab-btn" onclick="zeigeTab(1)"><span class="tab-num">2</span>Alter</button>
-      <button class="tab-btn" onclick="zeigeTab(2)"><span class="tab-num">3</span>Geburtsmonat</button>
-      <button class="tab-btn" onclick="zeigeTab(3)"><span class="tab-num">4</span>Diagramme</button>
+      <button class="tab-btn active" onclick="zeigeTab(0)"><span class="tab-num">🚀</span>Start</button>
+      <button class="tab-btn" onclick="zeigeTab(1)"><span class="tab-num">1</span>Körpergröße</button>
+      <button class="tab-btn" onclick="zeigeTab(2)"><span class="tab-num">2</span>Alter</button>
+      <button class="tab-btn" onclick="zeigeTab(3)"><span class="tab-num">3</span>Geburtsmonat</button>
+      <button class="tab-btn" onclick="zeigeTab(4)"><span class="tab-num">4</span>Diagramme</button>
+    </div>
+
+    <!-- ================= TAB START ================= -->
+    <div class="tab-content active" id="tab-start">
+      <h2 class="task-title">Willkommen zurück!</h2>
+      <p class="task-intro">Ihr habt bereits berechnet, wer bei der WM 2026 im Schnitt am treffsichersten war. 
+        Heute soll es ganz um eure eigene Klasse gehen und ihr bestimmt mit Excel das arithmetische Mittel. 
+        Die Daten sind schon eingetragen und ihr konzentriert euch ganz auf die Auswertung.</p>
+
+      <div class="discuss-box">
+        <b>Euer Weg durch die Stunde:</b> <br>
+        Klickt euch oben durch die vier Abschnitte "Körpergröße", "Alter", "Geburtsmonat" und "Diagramme". 
+        Bearbeitet sie der Reihe nach.
+      </div>
+
+      <h3 style="color:var(--color-secondary-dark); margin-top:28px;">Bevor es losgeht: Die Datei öffnen</h3>
+      <ol class="steps">
+        <li>Öffnet die vorbereitete Datei mit allen Daten eurer Klasse:<br>
+          <a class="download-link" href="Daten_6C.xlsx" download>📥 Excel-Datei herunterladen</a>
+        </li>
+        <li>Unten im Fenster seht ihr drei Reiter für die Tabellenblätter: <b>Körpergröße</b>, <b>Alter</b> und <b>Geburtsmonat</b>. 
+          Jedes enthält die Schülernummer (Spalte A) und die passenden Werte (Spalte B).
+          <div class="sheet-tabs-mock" style="margin-top: 1em;">
+            <span class="st active">Körpergröße</span>
+            <span class="st">Alter</span>
+            <span class="st">Geburtsmonat</span>
+          </div></li>
+      </ol>
+
+      <br>
+
+      <button class="start-cta" onclick="zeigeTab(1)">Los geht's mit Aufgabe 1 →</button>
     </div>
 
     <!-- ================= TAB 1 ================= -->
-    <div class="tab-content active" id="tab-0">
+    <div class="tab-content" id="tab-1">
       <h2 class="task-title">Wie groß ist unsere Klasse?</h2>
-      <p class="task-intro">Führe die folgenden Schritte nacheinander aus und lasse automatisch das arithmetische Mittel berechnen.</p>
-
-      <div class="discuss-box">
-        <b>Lies alle Arbeitsaufträge aufmerksam!</b>        
-      </div>
+      <p class="task-intro">Befolgt die folgenden Arbeitsschritte, damit Excel automatisch das arithmetische Mittel der Körpergrößen berechnet.</p>
 
       <ol class="steps" style="margin-top:1.5em;">
-        <li>Trage fortlaufende Schülernummern (1, 2, 3, …) in Spalte <b>A</b> ein.</li>
-        <li>Trage alle Körpergrößen (nur die Zahlenwerte in cm, ohne Einheit) in Spalte <b>B</b> ein.</li>
-        <li>Klicke in eine leere Zelle unterhalb der Werte.<br>
-          Berechne dort das arithmetische Mittel: <code>=SUMME(B2:B26)/25</code> (25 = Anzahl eurer Werte)</li>
-        <li>Passe den Zellbereich (<code>B2:B26</code>) und die Zahl 25 an die tatsächliche Anzahl der Werte und der Schüler:innen in eurer Klasse an.</li>
-        <li>Bestätige alles mit Enter. Du solltest nun erfolgreich die durchschnittliche Körpergröße berechnet haben! 🎉</li>
+        <li>Öffnet unten das Tabellenblatt <b>"Körpergröße"</b>. Spalte A zeigt die Schülernummern, Spalte B die Körpergrößen in cm.</li>
+        <li>Klickt in eine leere Zelle unterhalb der Werte (z. B. B29, neben "Mittelwert:").</li>
+        <li>Berechnet dort das arithmetische Mittel: <code>=MITTELWERT(B2:B28)</code></li>
+        <li>Bestätigt mit Enter. Du solltest nun erfolgreich die durchschnittliche Körpergröße berechnet haben! 🎉</li>
       </ol>
 
       <div class="xl-window">
-        <div class="xl-bar"><span class="fx">fx</span> <span class="formula-text">=SUMME(B2:B26)/25</span></div>
+        <div class="xl-bar"><span class="fx">fx</span> <span class="formula-text">=MITTELWERT(B2:B28)</span></div>
         <table class="xl-grid">
           <tr><th></th><th>A</th><th>B</th><th></th></tr>
-          <tr><td class="rownum">1</td><td class="name-col"><b>Nr.</b></td><td><b>Größe (cm)</b></td><td class="hint">← Überschriften</td></tr>
-          <tr><td class="rownum">2</td><td class="name-col">1</td><td>152</td><td class="hint">← Nummern &amp; Werte eintragen</td></tr>
-          <tr><td class="rownum">3</td><td class="name-col">2</td><td>148</td><td></td></tr>
-          <tr><td class="rownum">4</td><td class="name-col">3</td><td>155</td><td></td></tr>
-          <tr><td class="rownum">5</td><td class="name-col">4</td><td>150</td><td></td></tr>
-          <tr><td class="rownum">6</td><td class="name-col">…</td><td>…</td><td></td></tr>          
-          <tr class="mean-row"><td class="rownum">27</td><td class="name-col">Mittelwert</td><td class="active-cell formula-code">=SUMME(B2:B26)/25</td><td class="hint">← Das ist unser gesuchter Wert!</td></tr>
+          <tr><td class="rownum">1</td><td class="name-col"><b>Nr.</b></td><td><b>Größe (cm)</b></td><td class="hint">← schon eingetragen</td></tr>
+          <tr><td class="rownum">2</td><td class="name-col">1</td><td>150</td><td></td></tr>
+          <tr><td class="rownum">...</td><td class="name-col">…</td><td>…</td><td></td></tr>
+          <tr><td class="rownum">28</td><td class="name-col">27</td><td>153</td><td></td></tr>
+          <tr class="mean-row"><td class="rownum">29</td><td class="name-col">Mittelwert</td><td class="active-cell formula-code">=MITTELWERT(B2:B28)</td><td class="hint">← Das ist unser gesuchter Wert!</td></tr>
         </table>
       </div>
 
       <div class="discuss-box">
-        <b>Vergleich:</b> Für 11–12-Jährige liegt der Durchschnitt laut Wachstumstabellen bei ca. 145–152 cm. Passt euer Ergebnis dazu?
+        <b>Vergleich:</b> Für 11–13-Jährige liegt der Durchschnitt laut Wachstumstabellen bei ca. 150 bis 162 cm. Passt euer Ergebnis dazu?
+      </div>
+
+      <div class="bonus-box">
+        <span class="tag" style="padding-top: 0.5em; padding-bottom: 0.5em;">⭐ Kniffliger Bonus</span><br>
+        Stellt euch vor, ein weiteres Kind kommt neu in eure Klasse. Wie groß müsste dieses Kind sein, damit der <b>neue</b> Mittelwert genau 160 cm beträgt?
       </div>
     </div>
 
     <!-- ================= TAB 2 ================= -->
-    <div class="tab-content" id="tab-1">
+    <div class="tab-content" id="tab-2">
       <h2 class="task-title">Wie alt ist die Klasse im Schnitt?</h2>
-      <p class="task-intro">Gleiches Prinzip, neue Daten. Diesmal mit weniger Anleitung</p>
+      <p class="task-intro">Gleiches Prinzip, neue Daten. Diesmal mit weniger Anleitung.</p>
 
       <ol class="steps">
-        <li>Ergänze das Alter (in Jahren) in Spalte <b>C</b>.</li>
-        <li>Berechne den Mittelwert genauso wie bei Aufgabe 1 mit <code>=SUMME(...)</code> und der Division durch eure Klassengröße.</li>
+        <li>Öffnet unten das Tabellenblatt <b>"Alter"</b>.</li>
+        <li>Berechnet den Mittelwert genauso wie bei Aufgabe 1 mit der Funktion <code>=MITTELWERT(...)</code>.</li>
       </ol>
 
       <div class="xl-window">
-        <div class="xl-bar"><span class="fx">fx</span> <span class="formula-text">=SUMME(C2:C26)/25</span></div>
+        <div class="xl-bar"><span class="fx">fx</span> <span class="formula-text"></span></div>
         <table class="xl-grid">
-          <tr><th></th><th>A</th><th>B</th><th>C</th><th></th></tr>
-          <tr><td class="rownum">1</td><td class="name-col"><b>Nr.</b></td><td><b>Größe (cm)</b></td><td><b>Alter (in Jahren)</b></td><td></td></tr>
-          <tr><td class="rownum">2</td><td class="name-col">1</td><td>...</td><td>11</td><td></td></tr>
-          <tr><td class="rownum">3</td><td class="name-col">2</td><td>...</td><td>12</td><td></td></tr>
-          <tr><td class="rownum">4</td><td class="name-col">3</td><td>...</td><td>11</td><td></td></tr>
-          <tr><td class="rownum">5</td><td class="name-col">…</td><td>...</td><td>…</td><td></td></tr>
-          <tr class="mean-row"><td class="rownum">27</td><td class="name-col">Mittelwert</td><td>...</td><td class="active-cell formula-code">=SUMME(C2:C26)/25</td><td class="hint">← gesuchter Wert</td></tr>
+          <tr><th></th><th>A</th><th>B</th><th></th></tr>
+          <tr><td class="rownum">1</td><td class="name-col"><b>Nr.</b></td><td><b>Alter (Jahre)</b></td><td></td></tr>
+          <tr><td class="rownum">2</td><td class="name-col">1</td><td>12</td><td></td></tr>
+          <tr><td class="rownum">...</td><td class="name-col">…</td><td>…</td><td></td></tr>
+          <tr><td class="rownum">28</td><td class="name-col">27</td><td>13</td><td></td></tr>
+          <tr class="mean-row"><td class="rownum">29</td><td class="name-col">Mittelwert</td><td class="active-cell formula-code"></td><td class="hint">← hier die Formel eintragen</td></tr>
         </table>
-      </div>      
+      </div>
+
+      <div class="bonus-box">
+        <span class="tag" style="padding-top: 0.5em; padding-bottom: 0.5em;">⭐ Kniffliger Bonus</span><br>
+        Was passiert, wenn sich bei der Eingabe ein Fehler einschleicht, wie z. B. "21" statt "12" bei einer Schülerin oder einem Schüler? 
+        Ändert testweise einen Wert und beobachtet wie stark sich der Mittelwert durch nur einen einzigen falschen Wert verändert. 
+        Was bedeutet das für die Sorgfalt beim Prüfen von Daten?
+      </div>
     </div>
 
     <!-- ================= TAB 3 ================= -->
-    <div class="tab-content" id="tab-2">
+    <div class="tab-content" id="tab-3">
       <h2 class="task-title">Geburtsmonate unserer Klasse</h2>
 
       <ol class="steps">
-        <li>Trage die Nummer des Geburtsmonats (Januar = 1, Februar = 2, … Dezember = 12) in Spalte <b>D</b> ein.</li>
-        <li>Berechne den Mittelwert wieder wie gewohnt: <code>=SUMME(D2:D26)/25</code></li>
+        <li>Öffnet unten das Tabellenblatt <b>"Geburtsmonat"</b>.</li>
+        <li>Berechnet den Mittelwert wieder wie gewohnt.</li>
       </ol>
 
       <div class="xl-window">
-        <div class="xl-bar"><span class="fx">fx</span> <span class="formula-text">=SUMME(D2:D26)/25</span></div>
+        <div class="xl-bar"><span class="fx">fx</span> <span class="formula-text">=MITTELWERT(B2:B27)</span></div>
         <table class="xl-grid">
-          <tr><th></th><th>A</th><th>...</th><th>D</th><th></th></tr>
-          <tr><td class="rownum">1</td><td class="name-col"><b>Nr.</b></td><td><b>...</b></td><td><b>Geburtsmonat (Nr.)</b></td><td></td></tr>
-          <tr><td class="rownum">2</td><td class="name-col">1</td><td>...</td><td>3</td><td class="hint">← März = 3</td></tr>
-          <tr><td class="rownum">3</td><td class="name-col">2</td><td>...</td><td>7</td><td></td></tr>
-          <tr><td class="rownum">4</td><td class="name-col">3</td><td>...</td><td>12</td><td></td></tr>
-          <tr><td class="rownum">5</td><td class="name-col">…</td><td>...</td><td>…</td><td></td></tr>
-          <tr class="mean-row"><td class="rownum">27</td><td class="name-col">Mittelwert</td><td>...</td><td class="active-cell formula-code">=SUMME(D2:D26)/25</td><td class="hint">← z. B. 6,3</td></tr>
+          <tr><th></th><th>A</th><th>B</th><th></th></tr>
+          <tr><td class="rownum">1</td><td class="name-col"><b>Nr.</b></td><td><b>Geburtsmonat (Nr.)</b></td><td></td></tr>
+          <tr><td class="rownum">2</td><td class="name-col">1</td><td>10</td><td class="hint">← Oktober = 10</td></tr>
+          <tr><td class="rownum">...</td><td class="name-col">…</td><td>…</td><td></td></tr>
+          <tr><td class="rownum">28</td><td class="name-col">27</td><td>3</td><td></td></tr>
+          <tr class="mean-row"><td class="rownum">29</td><td class="name-col">Mittelwert</td><td class="active-cell formula-code"></td><td class="hint">← hier die Formel eintragen</td></tr>
         </table>
       </div>
 
       <div class="warn-box">
-        <b>Zusatzfrage:</b> Was bedeutet das arithmetische Mittel, wie z. B. "Monat 6,3" überhaupt? Ist das genauso sinnvoll wie eine durchschnittliche Körpergröße?
+        <b>Zusatzfrage:</b> Was bedeutet das arithmetische Mittel, wie z. B. "Monat 4,85" überhaupt? 
+        Ist das genauso sinnvoll wie eine durchschnittliche Körpergröße?
       </div>
 
       <div class="discuss-box">
-        <b>Bundesweiter Vergleich:</b> Geburten verteilen sich nicht exakt gleich auf alle Monate. Der Februar liegt oft am unteren Ende.     
+        <b>Bundesweiter Vergleich:</b> Geburten verteilen sich nicht exakt gleich auf alle Monate. Der Februar liegt oft am unteren Ende. 
+        Ist das bei euch genauso? Woran könnte es liegen? Stelle Vermutungen an.     
+      </div>
+
+      <div class="bonus-box">
+        <span class="tag" style="padding-top: 0.5em; padding-bottom: 0.5em;">⭐ Kniffliger Bonus</span><br>
+        Sucht in eurer Liste den Monat, der am <b>häufigsten</b> vorkommt. Ist dieser Monat derselbe wie der berechnete "Mittelwert-Monat"? 
+        Was sagt euch das über die Aussagekraft der beiden Kennzahlen bei dieser Art von Daten?
       </div>
     </div>
 
     <!-- ================= TAB 4 ================= -->
-    <div class="tab-content" id="tab-3">
+    <div class="tab-content" id="tab-4">
       <h2 class="task-title">Häufigkeiten sichtbar machen: Diagramme</h2>     
-      <p class="task-intro">Ein Mittelwert ist nicht immer die beste Kennzahl. Manchmal zeigt ein Diagramm die Verteilung viel anschaulicher.</p>
 
       <div class="subtask">
         <h3>Wie verteilt sich das Alter?</h3>
         <p class="task-intro">Der Mittelwert zeigt nur einen einzigen Wert. Ein Diagramm zeigt, wie die Altersgruppen tatsächlich verteilt sind.</p>
 
         <ol class="steps">
-          <li>Erstelle ein neues Tabellenblatt:</li>    
-          <div class="xl-window">
-            <img src="excel_neuesBlatt.png" alt="Screenshot: Neues Tabellenblatt über das Plus-Symbol anlegen" style="width:100%; display:block;">
-            <div style="padding:8px 12px; font-size:0.82rem; color:#666; background:#f8f8f8; border-top:1px solid #e2e5ea;">Klicke auf das <b>"+"</b> rechts neben eurem Tabellenblatt (hier "Tabelle1"), um ein neues Arbeitsblatt zu erstellen.</div>
-          </div>                
-          <li>Zähle zunächst, wie viele Schüler:innen 11, 12 oder 13 Jahre alt sind.</li>
-          <li>Trage dann die Altersgruppen in Spalte <b>A</b> und die Anzahl der Schüler:innen je Altersgruppe in Spalte <b>B</b> ein.</li>
-          <li>Berechne die Gesamtsumme aller Schülerinnen und Schüler: <code>=SUMME(B2:B4)</code></li>
-          <li>Berechne in Zelle <b>C2</b> die relative Häufigkeit in %: <code>=(B2/$B$5)*100</code>.</li>
-          <li>Kopiere die Formel aus Zelle <b>C2</b> nach unten. </li>
-          <li>Markiere die Spalten A und B. Wähle <b>Einfügen &rarr; Säulendiagramm</b>.</li>
-          <li>Markiere Spalte A und C gemeinsam (mit gedrückter <b>STRG</b>-Taste). Wähle <b>Einfügen &rarr; Kreisdiagramm</b> (2D-Kreis).</li>
+          <li>Wechselt zurück zum Tabellenblatt <b>"Alter"</b>. 
+            Markiert Spalte B und sortiert die Werte: <b>Daten &rarr; Sortieren</b>. 
+            Jetzt stehen gleiche Werte untereinander. So lässt sich einfach durchzählen, wie oft jeder Wert vorkommt.</li>
+          <li>Zähle so, wie viele Schüler:innen 11, 12, 13 oder 14 Jahre alt sind.</li>
+          <li>Trage dann die Altersgruppen in Spalte <b>D</b> und die Anzahl der Schüler:innen je Altersgruppe in Spalte <b>E</b> ein.</li>
+          <li>Berechne die Gesamtsumme aller Schülerinnen und Schüler mit der Formel <code>=SUMME(...)</code></li>
+          <li>Berechne in Zelle <b>F2</b> die relative Häufigkeit in %: <code>=(E2/$E$6)</code> (als Prozentwert darstellen lassen).</li>
+          <li>Kopiere die Formel aus Zelle <b>F2</b> nach unten. </li>
+          <li>Markiere die Spalten D und E. Wähle <b>Einfügen &rarr; Säulendiagramm</b>.</li>
+          <li>Markiere Spalte D und F gemeinsam (mit gedrückter <b>STRG</b>-Taste). Wähle <b>Einfügen &rarr; Kreisdiagramm</b> (2D-Kreis).</li>
         </ol>
 
         <div class="xl-window">
-          <div class="xl-bar"><span class="fx">fx</span> <span class="formula-text">=(B2/$B$5)*100</span></div>
+          <div class="xl-bar"><span class="fx">fx</span> <span class="formula-text">=E2/$E$6</span></div>
           <table class="xl-grid">
-            <tr><th></th><th>A</th><th>B</th><th>C</th></tr>
-            <tr><td class="rownum">1</td><td class="name-col"><b>Alter</b></td><td><b>Häufigkeit</b></td><td><b>rel. Häufigkeit</b></td></tr>
-            <tr><td class="rownum">2</td><td class="name-col">11 Jahre</td><td>10</td><td class="active-cell formula-code">33,3 %</td></tr>
-            <tr><td class="rownum">3</td><td class="name-col">12 Jahre</td><td>18</td><td>60,0 %</td></tr>
-            <tr><td class="rownum">4</td><td class="name-col">13 Jahre</td><td>2</td><td>6,7 %</td></tr>
-            <tr class="sum-row"><td class="rownum">5</td><td class="name-col">Summe</td><td class="formula-code">=SUMME(B2:B4)</td><td>100 %</td></tr>
+            <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr>
+            <tr><td class="rownum">1</td><td class="name-col"><b>Nr.</b></td><td><b>Alter (Jahre)</b></td><td><b></b></td><td><b>Alter</b></td><td><b>abs. Häufigkeit</b></td><td><b>rel. Häufigkeit</b></td></tr>
+            <tr><td class="rownum">2</td><td>...</td><td>...</td><td></td><td class="name-col">11 Jahre</td><td>1</td><td class="active-cell formula-code">3,8 %</td></tr>
+            <tr><td class="rownum">3</td><td>...</td><td>...</td><td></td><td class="name-col">12 Jahre</td><td>22</td><td>84,6 %</td></tr>
+            <tr><td class="rownum">4</td><td>...</td><td>...</td><td></td><td class="name-col">13 Jahre</td><td>2</td><td>7,7 %</td></tr>
+            <tr><td class="rownum">5</td><td>...</td><td>...</td><td></td><td class="name-col">14 Jahre</td><td>1</td><td>3,8 %</td></tr>
+            <tr class="sum-row"><td class="rownum">6</td><td>...</td><td>...</td><td></td><td class="name-col">Summe</td><td class="formula-code">=SUMME(E2:E5)</td><td>100 %</td></tr>
           </table>
         </div>
 
-        <button class="reveal-btn" onclick="document.getElementById('chartsAlter').classList.toggle('show')">📊 Beispiel-Diagramme anzeigen</button>
-        <div class="chart-panel" id="chartsAlter">
-          <div class="chart-box">
-            <div class="pie" style="background:conic-gradient(var(--color-primary) 0% 33.3%, var(--color-secondary-teal) 33.3% 93.3%, var(--color-note) 93.3% 100%);"></div>
-            <div class="legend">
-              <span><span class="sw" style="background:var(--color-primary);"></span>11 J.</span>
-              <span><span class="sw" style="background:var(--color-secondary-teal);"></span>12 J.</span>
-              <span><span class="sw" style="background:var(--color-note);"></span>13 J.</span>
-            </div>
-            <div class="cap">Kreisdiagramm</div>
-          </div>
-          <div class="chart-box">
-            <div class="bars">
-              <div class="bar" style="height:56%; background:var(--color-primary);"><span>10</span></div>
-              <div class="bar" style="height:100%; background:var(--color-secondary-teal);"><span>18</span></div>
-              <div class="bar" style="height:12%; background:var(--color-note);"><span>2</span></div>
-            </div>
-            <div class="cap">Säulendiagramm</div>
-          </div>
+        <div class="discuss-box">
+          <b>Hinweis:</b> Die Häufigkeiten hier in der Tabelle sind nur Beispielwerte!
+        </div>        
+        <div class="bonus-box">
+          <span class="tag" style="padding-top: 0.5em; padding-bottom: 0.5em;">⭐ Kniffliger Bonus</span><br>
+          Könnt ihr aus eurem Kreisdiagramm zur Altersverteilung ablesen, wie viele Prozent der Klasse <b>nicht</b> 12 Jahre alt sind ohne die einzelnen Anteile einzeln zu addieren? 
+          Überlegt euch eine cleverere Rechnung.
         </div>
       </div>
 
 
       <div class="subtask">
         <h3>🚀 Für Schnelle</h3>
-        <p class="task-intro">Lege eine weitere Häufigkeitstabelle zu den Geburtsmonaten an.<br>
-        Erstelle dazu wieder ein neues Tabellenblatt und orientiere dich an folgender Übersicht:</p>
+        <p class="task-intro">Legt genauso wie für das Alter eine weitere Häufigkeitstabelle zu den Geburtsmonaten an.<br><br>
+        Wechselt zum Tabellenblatt <b>"Geburtsmonat"</b> und sortiert auch hier zunächst die Werte (Spalte B, kleinster zu größter), um die Häufigkeiten leichter auszuzählen. 
+        Orientiert euch dann an folgender Übersicht:</p>
 
         <div class="xl-window">
-          <div class="xl-bar"><span class="fx">fx</span> <span class="formula-text">=(B9/$B$14)*100</span></div>
+          <div class="xl-bar"><span class="fx">fx</span> <span class="formula-text"></span></div>
           <table class="xl-grid">
-            <tr><th></th><th>A</th><th>B</th><th>C</th></tr>
-            <tr><td class="rownum">1</td><td class="name-col"><b>Monat</b></td><td><b>Häufigkeit</b></td><td><b>rel. Häufigkeit</b></td></tr>
-            <tr><td class="rownum">2</td><td class="name-col">Januar</td><td>3</td><td>10,0 %</td></tr>
-            <tr><td class="rownum">3</td><td class="name-col">Februar</td><td>2</td><td>6,7 %</td></tr>
-            <tr><td class="rownum">4</td><td class="name-col">März</td><td>4</td><td>13,3 %</td></tr>
-            <tr><td class="rownum">5</td><td class="name-col">…</td><td>…</td><td>…</td></tr>
-            <tr><td class="rownum">9</td><td class="name-col">August</td><td>6</td><td class="active-cell formula-code">20,0 %</td></tr>
-            <tr><td class="rownum">10</td><td class="name-col">…</td><td>…</td><td>…</td></tr>
-            <tr class="sum-row"><td class="rownum">14</td><td class="name-col">Summe</td><td class="formula-code">=SUMME(B2:B13)</td><td>100 %</td></tr>
+            <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr>
+            <tr><td class="rownum">1</td><td class="name-col"><b>Nr.</b></td><td><b>Geburtsmonat (Nr.)</b></td><td><b></b></td><td><b>Monat</b></td><td><b>abs. Häufigkeit</b></td><td><b>rel. Häufigkeit</b></td></tr>
+            <tr><td class="rownum">2</td><td>...</td><td>...</td><td></td><td class="name-col">Januar</td><td>3</td><td class="active-cell formula-code">11,5 %</td></tr>
+            <tr><td class="rownum">3</td><td>...</td><td>...</td><td></td><td class="name-col">Februar</td><td>...</td><td>...</td></tr>
+            <tr><td class="rownum">4</td><td>...</td><td>...</td><td></td><td class="name-col">...</td><td>...</td><td>...</td></tr>
+            <tr><td class="rownum">5</td><td>...</td><td>...</td><td></td><td class="name-col">Dezember</td><td>...</td><td>...</td></tr>
+            <tr class="sum-row"><td class="rownum">...</td><td>...</td><td>...</td><td></td><td class="name-col">Summe</td><td class="formula-code">...</td><td>100 %</td></tr>
           </table>
-        </div>
+        </div>      
 
         <p class="task-intro">Visualisiere deine Werte erneut in einem Säulendiagramm und einem Kreisdiagramm.</p>        
         </div>
+
+        <div class="discuss-box">
+          <b>Recherche:</b> Sucht eine Statistik zu den Geburtsmonaten in Deutschland und vergleicht diese mit den Anteilen eurer Klasse.
+        </div> 
+        
         
       </div>
     </div>
