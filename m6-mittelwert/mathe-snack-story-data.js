@@ -77,6 +77,35 @@ const story = [
   },
   {
     type: 'quiz',
+    text: "Ui, wir haben auch gerade eine Matheschulaufgabe zurückbekommen 😅 Das sind die Noten aus unserer Klasse:<br><b>3, 1, 4, 5, 3, 4, 2, 1, 2, 1, 4</b><br>Wie hoch ist die absolute Häufigkeit der Note 1?",
+    options: ["1", "3", "4", "11"],
+    correctHash: "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+    feedbackCorrect: "Genau, die Note 1 taucht 3-mal auf. Das ist die <b>absolute Häufigkeit</b> der Note 1.",
+    feedbackWrong: "Zähl noch mal ganz genau nach, wie oft die Zahl 1 in der Liste 3, 1, 4, 5, 3, 4, 2, 1, 2, 1, 4 vorkommt."
+  },
+  {
+    type: 'quiz',
+    text: "Wir bleiben bei dieser Notenliste. Angenommen, du willst jetzt die <b>relative</b> Häufigkeit einer Note berechnen. Durch welche Zahl musst du dafür teilen?",
+    options: [
+      "5, weil es die Noten 1 bis 5 gibt",
+      "6, weil 5 + 1 die nächsthöhere Zahl ist",
+      "10, weil das eine runde Zahl ist",
+      "11, weil so viele Noten insgesamt geschrieben wurden"
+    ],
+    correctHash: "7fde8b1c3ba8e1ba1d349379ddbd5afda499751adcba5e8993086d953757c0b9",
+    feedbackCorrect: "Richtig! Für die relative Häufigkeit teilst du immer durch die <b>Gesamtanzahl aller Werte</b> - hier durch 11, nicht durch die Anzahl der Notenstufen.",
+    feedbackWrong: "Zähl noch mal, wie viele Noten insgesamt in der Liste stehen - nicht wie viele verschiedene Notenstufen es von 1 bis 5 gibt."
+  },
+  {
+    type: 'quiz',
+    text: "In einer weiteren Arbeit haben 4 von 20 Schülerinnen und Schülern die Note 'gut' (also die Note 2) bekommen. Wie hoch ist die relative Häufigkeit der Note 2 in dieser Arbeit?",
+    options: ["4 %", "20 %", "80 %", "0,2 %"],
+    correctHash: "7ae8d407dd41b0f28c0c8ce78128e16988117cf7bf6b01e1c2cf6bedd726d646",
+    feedbackCorrect: "Stimmt! 4 : 20 = 0,2 = <b>20 %</b>.",
+    feedbackWrong: "Rechne zuerst 4 : 20 und wandle das Ergebnis dann in Prozent um (also mal 100)."
+  },
+  {
+    type: 'quiz',
     text: "Zum Schluss noch eine kleine Transferaufgabe: In einer anderen Umfrage kommen von 40 Kindern 6 mit dem Auto zur Schule. Wie groß ist die relative Häufigkeit für 'Auto'?",
     options: ["6 %", "15 %", "34 %", "60 %"],
     correctHash: "d2de465fc2ea21ea28ab8fddc8bd39c6f45bde60cf02ff4f23acaf47332cb98e",
