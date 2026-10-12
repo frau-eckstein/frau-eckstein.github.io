@@ -786,8 +786,8 @@ const MISSIONS=[
 const LEVELS=[[0,'Neugierig'],[200,'Publisher'],[500,'Subscriber'],[800,'Broker-Profi'],[1100,'IoT-Architekt']];
 const MAXXP=MISSIONS.reduce((a,m)=>a+m.xp,0);
 let DONE=new Set();
-try{DONE=new Set(JSON.parse(localStorage.getItem('mqttlab.done')||'[]'));}catch(e){}
-function saveDone(){try{localStorage.setItem('mqttlab.done',JSON.stringify([...DONE]));}catch(e){}}
+try{DONE=new Set(JSON.parse(sessionStorage.getItem('mqttlab.done')||'[]'));}catch(e){}
+function saveDone(){try{sessionStorage.setItem('mqttlab.done',JSON.stringify([...DONE]));}catch(e){}}
 function xpNow(){return MISSIONS.filter(m=>DONE.has(m.id)).reduce((a,m)=>a+m.xp,0);}
 function emit(type,data={}){
   if(type==='route'&&data.from===attacker&&data.targets===0){aOut('Niemand hat die Nachricht empfangen. Das Präfix stimmt nicht.','bad');emit('attack_blocked',{how:'prefix'});}
@@ -918,14 +918,14 @@ function openIntro(){
   if(introEl.showModal){if(!introEl.open)introEl.showModal();}else introEl.setAttribute('open','');
 }
 function closeIntro(){
-  try{localStorage.setItem('mqttlab.intro','1');}catch(e){}
+  try{sessionStorage.setItem('mqttlab.intro','1');}catch(e){}
   if(introEl.close)introEl.close();else introEl.removeAttribute('open');
   window.scrollTo({top:Math.max(0,$('#stage').getBoundingClientRect().top+scrollY-12),behavior:reduceMotion?'auto':'smooth'});
 }
 $('#in-next').addEventListener('click',()=>{if(istep===STEPS.length-1)closeIntro();else{istep++;renderIntro();}});
 $('#in-back').addEventListener('click',()=>{if(istep>0){istep--;renderIntro();}});
 $('#in-skip').addEventListener('click',closeIntro);
-introEl.addEventListener('close',()=>{try{localStorage.setItem('mqttlab.intro','1');}catch(e){}});
+introEl.addEventListener('close',()=>{try{sessionStorage.setItem('mqttlab.intro','1');}catch(e){}});
 $('#intro-btn').addEventListener('click',openIntro);
 
 /* ---------- Verbindungslinien ---------- */
@@ -954,7 +954,7 @@ async function boot(){
 }
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(drawLinks);
 boot();
-try{if(!localStorage.getItem('mqttlab.intro'))openIntro();}catch(e){openIntro();}
+try{if(!sessionStorage.getItem('mqttlab.intro'))openIntro();}catch(e){openIntro();}
 })();
 </script>
 </body>
