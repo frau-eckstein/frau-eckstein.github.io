@@ -1,0 +1,961 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MQTT-Labor: Smarthome</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">
+    <svg viewBox="0 0 48 48" aria-hidden="true">
+      <rect width="48" height="48" rx="14" fill="var(--navy)"/>
+      <path d="M12 34 24 14l12 20" fill="none" stroke="var(--on-navy)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <circle cx="12" cy="34" r="4.5" fill="var(--accent)"/><circle cx="36" cy="34" r="4.5" fill="var(--teal)"/><circle cx="24" cy="14" r="5" fill="var(--note)"/>
+    </svg>
+    <div>
+      <h1>MQTT-Labor: Smarthome</h1>
+      <p class="sub">Steuerung eines Hauses über einen Broker und Verfolgung der Nachrichtenübermittlung</p>
+    </div>
+  </div>
+  <div class="tools">
+    <div class="xp" aria-label="Fortschritt"><span class="lvl" id="lvl">Neugierig</span><span class="bar"><i id="xpbar"></i></span><span class="num" id="xpnum">0 XP</span></div>
+    <button class="btn" id="intro-btn">Einführung</button>
+    <button class="btn" id="slow" aria-pressed="false">Zeitlupe</button>
+    <button class="btn" id="theme" aria-label="Darstellung wechseln">Dunkel</button>
+  </div>
+</header>
+
+<section class="strip" id="strip" aria-live="polite"></section>
+
+<section class="stage" id="stage">
+  <svg id="links" aria-hidden="true"></svg>
+  <div class="legend" aria-label="Legende der Nachrichten">
+    <span><i class="lg-cmd"></i>Befehl</span><span><i class="lg-status"></i>Statusmeldung</span><span><i class="lg-sens"></i>Messwert</span><span><i class="lg-will"></i>Last Will und Angriff</span>
+  </div>
+  <div id="alarm" class="alarm-bar" role="alert" hidden></div>
+
+  <div class="cols">
+    <!-- Smartphone -->
+    <div class="col-phone">
+      <div class="phone" id="phone" aria-label="Smartphone mit Smarthome-App">
+        <div class="screen">
+          <div class="sb"><span id="clock">9:41</span>
+            <span class="sb-r"><span class="sig" id="sig" data-bars="4" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+              <button class="fly" id="fly" aria-pressed="false" aria-label="Flugmodus" title="Flugmodus"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg></button></span></div>
+          <div class="app-h"><strong>Mein Zuhause</strong><div class="conn" id="phone-conn"><i class="d"></i><span>verbunden</span></div></div>
+
+          <div class="app-body" id="app-steuern" role="tabpanel">
+            <div class="qos-row"><span>Zustellung</span>
+              <div class="seg" id="seg-qos" role="group" aria-label="Zustellgarantie"><button data-q="0" aria-pressed="true">QoS 0</button><button data-q="1" aria-pressed="false">QoS 1</button></div></div>
+            <div class="tiles" id="tiles"></div>
+          </div>
+
+          <div class="app-body" id="app-experte" role="tabpanel" hidden>
+            <label class="field">Topic<input id="ex-topic" list="dl-topics" spellcheck="false" autocomplete="off"></label>
+            <datalist id="dl-topics"></datalist>
+            <label class="field">Payload<input id="ex-payload" value="ein" spellcheck="false" autocomplete="off"></label>
+            <div class="row"><div class="seg" id="ex-qos" role="group" aria-label="QoS"><button data-q="0" aria-pressed="true">QoS 0</button><button data-q="1" aria-pressed="false">QoS 1</button></div>
+              <label class="chk"><input type="checkbox" id="ex-retain">Retain</label></div>
+            <button class="btn primary" id="ex-send">Veröffentlichen</button>
+            <h4>Abonnements der App</h4>
+            <ul class="list" id="ex-subs"></ul>
+            <div class="row"><input class="field-i" id="ex-newsub" aria-label="Neues Abonnement" placeholder="z. B. haus1/#" spellcheck="false" autocomplete="off" style="flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:6px 10px;font-family:var(--ff-mono);font-size:12px;color:var(--ink)"><button class="btn sm" id="ex-addsub">Abonnieren</button></div>
+            <h4>Zuletzt empfangen</h4>
+            <ul class="list" id="ex-inbox"></ul>
+          </div>
+
+          <div class="airplane" id="airplane" hidden>Flugmodus: Die App hat keine Verbindung zum Broker.</div>
+          <nav class="app-tabs" role="tablist" aria-label="App-Bereiche">
+            <button role="tab" aria-selected="true" data-app="steuern">Steuern</button>
+            <button role="tab" aria-selected="false" data-app="experte">Experte</button>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Broker -->
+    <div class="col-broker">
+      <div class="broker" id="broker">
+        <h3><svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 26a6 6 0 0 1-.5-12 8 8 0 0 1 15.5-1.5A6.5 6.5 0 0 1 26 26z"/><path d="M14 20h8M18 16v8"/></svg>MQTT-Broker</h3>
+        <div class="addr">broker.haus.lab:1883</div>
+        <div class="stats">
+          <div><b id="st-cl">0</b><span>verbunden</span></div>
+          <div><b id="st-msg">0</b><span>Nachrichten</span></div>
+          <div><b id="st-ret">0</b><span>gemerkt (R)</span></div>
+        </div>
+        <div class="ticker" id="ticker"><span class="muted" style="color:inherit;opacity:.75">Hier siehst du, an wie viele Abonnenten die letzte Nachricht verteilt wurde.</span></div>
+        <div class="access" id="access"><i></i><span id="access-t">Zugang offen: jeder darf sich verbinden</span></div>
+      </div>
+      <div class="atk" id="attacker" aria-label="Unbekanntes Gerät, Angreifer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c-4 0-6 3-6 7v3l-2 3h16l-2-3v-3c0-4-2-7-6-7z"/><path d="M9.5 11h.01M14.5 11h.01"/><path d="M9 20c1 1 5 1 6 0"/></svg>
+        <div><strong>Unbekanntes Gerät</strong><small id="atk-s">wartet in der Werkstatt auf Einsatz</small></div>
+      </div>
+    </div>
+
+    <!-- Haus -->
+    <div class="col-house">
+      <div class="house-card">
+<svg id="house" viewBox="0 0 600 450" role="group" aria-label="Querschnitt eines Hauses mit Smarthome-Geräten">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" style="stop-color:var(--lamp);stop-opacity:.95"/><stop offset="1" style="stop-color:var(--lamp);stop-opacity:0"/></radialGradient>
+    <clipPath id="c-fl"><rect x="90" y="265" width="110" height="137"/></clipPath>
+    <clipPath id="c-ku"><rect x="200" y="265" width="150" height="137"/></clipPath>
+    <clipPath id="c-wz"><rect x="350" y="265" width="160" height="137"/></clipPath>
+  </defs>
+  <rect class="h-ground" x="0" y="402" width="600" height="48"/>
+  <rect class="h-chimney" x="440" y="82" width="26" height="60"/>
+  <polygon class="h-roof" points="66,162 300,52 534,162"/>
+  <rect class="h-room" x="90" y="162" width="420" height="103"/>
+  <rect class="h-room" x="90" y="265" width="110" height="137"/>
+  <rect class="h-room" x="200" y="265" width="150" height="137"/>
+  <rect class="h-room" x="350" y="265" width="160" height="137"/>
+  <g class="furn">
+    <rect x="110" y="232" width="140" height="26" rx="4"/><rect x="110" y="214" width="14" height="44" rx="3"/>
+    <rect x="214" y="364" width="124" height="38" rx="3"/><rect x="226" y="350" width="34" height="14" rx="3"/>
+    <rect x="368" y="372" width="100" height="30" rx="8"/><rect x="368" y="352" width="100" height="24" rx="8"/>
+    <rect x="160" y="384" width="34" height="18" rx="2"/>
+  </g>
+  <rect class="dim" id="dim-fl-lampe" x="90" y="265" width="110" height="137"/>
+  <rect class="dim" id="dim-ku-lampe" x="200" y="265" width="150" height="137"/>
+  <rect class="dim" id="dim-wz-lampe" x="350" y="265" width="160" height="137"/>
+  <path class="h-wall" d="M90 162V402H510V162M90 265H510M200 265V402M350 265V402M66 162 300 52 534 162H66"/>
+
+  <!-- Lampen -->
+  <g class="dev lamp" id="dev-fl-lampe" tabindex="0" role="button" aria-label="Flur-Lampe" data-id="fl-lampe"><title>Flur-Lampe</title>
+    <circle class="glow" cx="145" cy="300" r="80" clip-path="url(#c-fl)"/>
+    <line class="cord" x1="145" y1="265" x2="145" y2="283"/><circle class="bulb" cx="145" cy="291" r="8"/>
+    <rect class="hit" x="122" y="265" width="46" height="48"/><circle class="selring" cx="145" cy="289" r="22"/><circle class="ddot" cx="159" cy="278" r="3.5"/></g>
+  <g class="dev lamp" id="dev-ku-lampe" tabindex="0" role="button" aria-label="Küchen-Lampe" data-id="ku-lampe"><title>Küchen-Lampe</title>
+    <circle class="glow" cx="275" cy="300" r="95" clip-path="url(#c-ku)"/>
+    <line class="cord" x1="275" y1="265" x2="275" y2="283"/><circle class="bulb" cx="275" cy="291" r="8"/>
+    <rect class="hit" x="252" y="265" width="46" height="48"/><circle class="selring" cx="275" cy="289" r="22"/><circle class="ddot" cx="289" cy="278" r="3.5"/></g>
+  <g class="dev lamp" id="dev-wz-lampe" tabindex="0" role="button" aria-label="Wohnzimmer-Lampe" data-id="wz-lampe"><title>Wohnzimmer-Lampe</title>
+    <circle class="glow" cx="430" cy="300" r="100" clip-path="url(#c-wz)"/>
+    <line class="cord" x1="430" y1="265" x2="430" y2="283"/><circle class="bulb" cx="430" cy="291" r="8"/>
+    <rect class="hit" x="407" y="265" width="46" height="48"/><circle class="selring" cx="430" cy="289" r="22"/><circle class="ddot" cx="444" cy="278" r="3.5"/></g>
+
+  <!-- Heizung -->
+  <g class="dev heater" id="dev-wz-heizung" tabindex="0" role="button" aria-label="Heizung Wohnzimmer" data-id="wz-heizung"><title>Heizung Wohnzimmer</title>
+    <g class="heat"><path d="M480 346c-6 6 6 10 0 18"/><path d="M472 350c-6 6 6 10 0 18"/><path d="M464 346c-6 6 6 10 0 18"/></g>
+    <rect class="rad" x="488" y="338" width="16" height="56" rx="3"/><path class="fin" d="M492 344v44M496 344v44M500 344v44"/>
+    <rect class="hit" x="458" y="330" width="52" height="72"/><circle class="selring" cx="496" cy="366" r="34"/><circle class="ddot" cx="496" cy="330" r="3.5"/></g>
+
+  <!-- Temperatursensor -->
+  <g class="dev sensor" id="dev-wz-temp" tabindex="0" role="button" aria-label="Temperatursensor Wohnzimmer" data-id="wz-temp"><title>Temperatursensor Wohnzimmer</title>
+    <rect class="sbody" x="360" y="304" width="36" height="28" rx="7"/><text class="sval" id="tempval" x="378" y="323">19.0°</text>
+    <rect class="hit" x="354" y="298" width="48" height="40"/><circle class="selring" cx="378" cy="318" r="28"/><circle class="ddot" cx="394" cy="306" r="3.5"/></g>
+
+  <!-- Bewegungsmelder -->
+  <g class="dev pir" id="dev-fl-pir" tabindex="0" role="button" aria-label="Bewegungsmelder Flur" data-id="fl-pir"><title>Bewegungsmelder Flur</title>
+    <path class="pir-wave" d="M164 300a20 20 0 0 0 32 0"/>
+    <path class="pbody" d="M170 266h20v8a10 10 0 0 1-20 0z"/>
+    <rect class="hit" x="160" y="264" width="40" height="44"/><circle class="selring" cx="180" cy="278" r="22"/><circle class="ddot" cx="194" cy="272" r="3.5"/></g>
+
+  <!-- Rollladen -->
+  <g class="dev rollo" id="dev-sz-rollo" tabindex="0" role="button" aria-label="Jalousie Schlafzimmer" data-id="sz-rollo"><title>Jalousie Schlafzimmer</title>
+    <rect class="win" x="430" y="182" width="60" height="60" rx="3"/>
+    <rect class="shade" id="shade" x="430" y="182" width="60" height="60" rx="3"/><path class="mull" d="M460 182v60M430 212h60"/>
+    <rect class="hit" x="424" y="176" width="72" height="72"/><circle class="selring" cx="460" cy="212" r="44"/><circle class="ddot" cx="486" cy="188" r="3.5"/></g>
+
+  <!-- Haustür -->
+  <g class="dev door" id="dev-fl-tuer" tabindex="0" role="button" aria-label="Haustür" data-id="fl-tuer"><title>Haustür mit Smartlock</title>
+    <rect class="door-gap" x="104" y="324" width="38" height="78"/>
+    <rect class="door-leaf" x="104" y="324" width="38" height="78" rx="2"/><circle class="knob" cx="135" cy="366" r="2.5"/>
+    <circle class="lock" cx="153" cy="352" r="6"/>
+    <rect class="hit" x="98" y="318" width="64" height="84"/><circle class="selring" cx="128" cy="362" r="46"/><circle class="ddot" cx="108" cy="330" r="3.5"/></g>
+
+  <g transform="translate(106 366)"><g class="person" id="person"><circle cx="0" cy="0" r="5"/><path d="M0 6v15M-7 12h14M0 21l-5 12M0 21l5 12"/></g></g>
+
+  <text class="h-label" x="145" y="426">Flur</text><text class="h-label" x="275" y="426">Küche</text><text class="h-label" x="430" y="426">Wohnzimmer</text>
+  <text class="h-label" x="150" y="182">Schlafzimmer</text>
+</svg>
+      </div>
+      <div class="house-actions">
+        <button class="btn sm" id="walk">Person durch den Flur schicken</button>
+      </div>
+    </div>
+  </div>
+  <div class="pktlayer" id="pkts" aria-hidden="true"></div>
+</section>
+
+<section class="dock" id="dock" aria-label="Werkzeuge">
+ <div class="dock-in">
+  <div class="tabs" role="tablist" aria-label="Werkzeuge">
+    <button role="tab" aria-selected="false" data-tab="missions">Missionen<span class="cnt" id="cnt-m">0/10</span></button>
+    <button role="tab" aria-selected="false" data-tab="device">Gerät</button>
+    <button role="tab" aria-selected="false" data-tab="log">Mitschnitt</button>
+    <button role="tab" aria-selected="false" data-tab="broker">Broker-Einblick</button>
+    <button role="tab" aria-selected="false" data-tab="lab">Werkstatt</button>
+    <button role="tab" aria-selected="false" data-tab="terms">Begriffe</button>
+    <span class="sp"></span>
+    <button id="dock-x" aria-label="Werkzeuge ein- oder ausklappen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
+  </div>
+  <div class="dock-body">
+  <div class="pane" id="pane-missions" role="tabpanel"><div class="missions" id="mlist"></div></div>
+
+  <div class="pane" id="pane-device" role="tabpanel" hidden><div class="inspector" id="inspector" aria-live="polite"></div></div>
+
+  <div class="pane" id="pane-log" role="tabpanel" hidden>
+    <div class="logbar">
+      <input id="flt" placeholder="Filter wie bei einem Abonnement, z. B. haus1/+/lampe/set oder haus1/#" aria-label="Themenfilter" spellcheck="false" autocomplete="off">
+      <button class="btn sm" id="pause" aria-pressed="false">Anhalten</button>
+      <button class="btn sm" id="clearlog">Leeren</button>
+    </div>
+    <p class="muted" style="margin:0 0 10px">Der Mitschnitt zeigt jede Nachricht, die den Broker erreicht oder verlässt. + steht für genau eine Ebene, # für alle weiteren Ebenen.</p>
+    <div class="log" id="log"></div>
+  </div>
+
+  <div class="pane" id="pane-broker" role="tabpanel" hidden>
+    <div class="cols2">
+      <div><h3>Clients und Abonnements</h3><div id="clients"></div></div>
+      <div><h3>Themenbaum</h3><p class="muted" style="margin:0 0 8px">Letzter Wert je Thema. <span class="chip r">R</span> markiert Werte, die der Broker für neue Abonnenten aufbewahrt.</p><ul class="tree" id="tree"></ul></div>
+    </div>
+  </div>
+
+  <div class="pane" id="pane-lab" role="tabpanel" hidden>
+    <div class="ctl">
+      <div class="box">
+        <h3>Verbindungsqualität</h3>
+        <p>Simuliert ein schwaches WLAN: Jedes Paket geht mit dieser Wahrscheinlichkeit verloren.</p>
+        <label for="loss" class="switch" style="display:block">Paketverlust: <b id="loss-v">0 %</b></label>
+        <input type="range" id="loss" min="0" max="80" step="10" value="0">
+      </div>
+      <div class="box">
+        <h3>Thema-Präfix</h3>
+        <p>Alle Themen beginnen mit diesem Präfix. Beim Wechsel melden sich alle Geräte neu an.</p>
+        <div class="row" style="margin:0"><input type="text" id="prefix" value="haus1" aria-label="Präfix" spellcheck="false" autocomplete="off" maxlength="40"><button class="btn sm" id="prefix-set">Übernehmen</button></div>
+        <p id="prefix-msg" style="margin-top:8px"></p>
+      </div>
+      <div class="box">
+        <h3>Zugang zum Broker</h3>
+        <p>Mit Login darf sich nur verbinden, wer Benutzername und Passwort kennt. Deine Geräte haben beides.</p>
+        <label class="switch"><input type="checkbox" id="auth"> Login erforderlich</label>
+      </div>
+      <div class="box">
+        <h3>Zurücksetzen</h3>
+        <div class="act"><button class="btn" id="reset-sim">Simulation neu starten</button><button class="btn" id="reset-prog">Fortschritt löschen</button></div>
+      </div>
+      <div class="box atkbox" style="grid-column:1/-1">
+        <div>
+          <h3>Angreifer</h3>
+          <p>Das unbekannte Gerät kennt nur das Standard-Präfix <code id="a-known">haus1</code>. Es kann versuchen, alles mitzulesen und die Haustür zu öffnen.</p>
+          <div class="act"><button class="btn warn" id="a-listen">1. Mithören (alles abonnieren)</button><button class="btn warn" id="a-door">2. Haustür öffnen</button></div>
+        </div>
+        <div class="aout" id="a-out" role="log"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pane terms" id="pane-terms" role="tabpanel" hidden>
+    <dl>
+      <div class="t"><dt>Client</dt><dd>Jedes Gerät oder Programm, das sich mit dem Broker verbindet. <span class="lab">Im Labor: App, Lampen, Sensoren und Angreifer.</span></dd></div>
+      <div class="t"><dt>Broker</dt><dd>Der Vermittler in der Mitte. Er nimmt Nachrichten an und verteilt sie an alle, die das Thema abonniert haben. <span class="lab">Im Labor: die dunkle Karte in der Mitte.</span></dd></div>
+      <div class="t"><dt>Topic (Thema)</dt><dd>Die Adresse einer Nachricht, in Ebenen mit / gegliedert. <span class="lab">z. B. haus1/kueche/lampe/set</span></dd></div>
+      <div class="t"><dt>Payload</dt><dd>Der Inhalt der Nachricht. <span class="lab">z. B. ein, aus, 21.5</span></dd></div>
+      <div class="t"><dt>Publish und Publisher</dt><dd>Eine Nachricht zu einem Thema senden. Wer sendet, ist Publisher. <span class="lab">Die App sendet Befehle, der Sensor Messwerte.</span></dd></div>
+      <div class="t"><dt>Subscribe und Subscriber</dt><dd>Ein Thema abonnieren, um dessen Nachrichten zu erhalten. <span class="lab">Die Lampe abonniert ihren Befehls-Kanal.</span></dd></div>
+      <div class="t"><dt>Wildcard + und #</dt><dd>Platzhalter beim Abonnieren: + für genau eine Ebene, # für alle weiteren Ebenen. <span class="lab">haus1/+/lampe/set trifft alle Lampen.</span></dd></div>
+      <div class="t"><dt>QoS (Quality of Service)</dt><dd>Zustellgarantie: 0 höchstens einmal, 1 mindestens einmal, 2 genau einmal. <span class="lab">Wichtig bei schwachem WLAN.</span></dd></div>
+      <div class="t"><dt>Retain (R)</dt><dd>Der Broker merkt sich die letzte Nachricht eines Themas und liefert sie neuen Abonnenten sofort. <span class="lab">So kennt die App nach dem Flugmodus den Zustand.</span></dd></div>
+      <div class="t"><dt>Last Will</dt><dd>Nachricht, die der Broker sendet, wenn ein Client abstürzt. <span class="lab">Der Sensor wird als offline gemeldet.</span></dd></div>
+    </dl>
+  </div>
+  </div>
+ </div>
+</section>
+
+<p class="foot">Alles läuft als Simulation im Browser. Es gibt keinen echten Broker und es werden keine Daten versendet.</p>
+</div>
+
+<dialog class="intro" id="intro" aria-labelledby="in-title">
+  <div class="in-b" id="in-body"></div>
+  <div class="in-f"><div class="in-dots" id="in-dots" aria-hidden="true"></div>
+    <div class="row" style="margin:0"><button class="btn" id="in-skip">Überspringen</button><button class="btn" id="in-back">Zurück</button><button class="btn primary" id="in-next">Weiter</button></div></div>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(()=>{
+'use strict';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const reduceMotion=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const S={prefix:'haus1',known:'haus1',loss:0,slow:false,auth:false,paused:false,filter:'',defQos:0,exQos:0,offlineChanges:0};
+const T=rel=>S.prefix+'/'+rel;
+const speed=()=>(S.slow?3:1)*(reduceMotion?0.2:1);
+
+/* ---------- MQTT-Themenfilter ---------- */
+function match(filter,topic){
+  const f=filter.split('/'),t=topic.split('/');
+  for(let i=0;i<f.length;i++){
+    if(f[i]==='#')return true;
+    if(i>=t.length)return false;
+    if(f[i]!=='+'&&f[i]!==t[i])return false;
+  }
+  return f.length===t.length;
+}
+const kindOf=t=>t.endsWith('/set')?'cmd':t.endsWith('/status')?'status':t.endsWith('/wert')?'sens':'sys';
+
+/* ---------- Hilfen ---------- */
+function setHTML(el,html){
+  if(!el||el._h===html)return; el._h=html;
+  const a=document.activeElement; const fk=a&&el.contains(a)?a.getAttribute('data-fk'):null;
+  el.innerHTML=html;
+  if(fk){const sel=(window.CSS&&CSS.escape)?CSS.escape(fk):fk; const n=el.querySelector('[data-fk="'+sel+'"]'); if(n)n.focus({preventScroll:true});}
+}
+let renderQueued=false;
+function scheduleRender(){ if(renderQueued)return; renderQueued=true; requestAnimationFrame(()=>{renderQueued=false;renderAll();}); }
+
+/* ---------- Broker und Clients ---------- */
+const broker={retained:new Map(),seen:new Map(),count:0,last:null};
+const clients={};
+const brokerEl=$('#broker');
+class Client{
+  constructor(o){Object.assign(this,{subs:new Map(),connected:false,cred:true,onMessage(){},onConnect:async()=>{},defaultSubs:()=>[],will:null},o);clients[this.id]=this;}
+}
+const LOG=[];
+let logQueued=false;
+function log(e){e.t=new Date();LOG.unshift(e);if(LOG.length>400)LOG.pop();emit('log',e);if(!logQueued){logQueued=true;setTimeout(()=>{logQueued=false;renderLog();},120);}}
+
+function centerOf(el){
+  const st=$('#stage').getBoundingClientRect(), r=el.getBoundingClientRect();
+  if(!r.width&&!r.height)return{x:st.width/2,y:st.height/2};
+  return{x:r.left+r.width/2-st.left,y:r.top+r.height/2-st.top};
+}
+function flyPacket(from,to,{label,kind,lost,dup}){
+  return new Promise(res=>{
+    const a=centerOf(from),b=centerOf(to),layer=$('#pkts');
+    const p=document.createElement('div');p.className='pkt k-'+kind+(dup?' dup':'')+(lost?' lost':'');p.textContent=String(label).slice(0,10);
+    layer.appendChild(p);
+    const tf=(x,y,extra='')=>`translate(${x}px,${y}px) translate(-50%,-50%)${extra}`;
+    const dur=Math.max(160,(380+Math.hypot(b.x-a.x,b.y-a.y)*0.9)*speed());
+    let frames;
+    if(lost){
+      const mx=a.x+(b.x-a.x)*.55,my=a.y+(b.y-a.y)*.55;
+      frames=[{transform:tf(a.x,a.y),opacity:0},{transform:tf(a.x+(mx-a.x)*.1,a.y+(my-a.y)*.1),opacity:1,offset:.08},{transform:tf(mx,my),opacity:1,offset:.75},{transform:tf(mx,my,' scale(1.4)'),opacity:0}];
+    }else{
+      frames=[{transform:tf(a.x,a.y),opacity:0},{transform:tf(a.x+(b.x-a.x)*.06,a.y+(b.y-a.y)*.06),opacity:1,offset:.07},{transform:tf(b.x,b.y),opacity:1,offset:.92},{transform:tf(b.x,b.y,' scale(.6)'),opacity:0}];
+    }
+    const done=()=>{p.remove();res();};
+    try{const an=p.animate(frames,{duration:dur,easing:'ease-in-out',fill:'forwards'});an.finished.then(done,done);}catch(e){setTimeout(done,dur);}
+  });
+}
+async function transmit(from,to,{label,kind,qos=0,meta={}}){
+  const max=qos>=1?6:1;let attempts=0;
+  while(attempts<max){
+    attempts++;
+    const lost=Math.random()<S.loss;
+    await flyPacket(from,to,{label,kind,lost,dup:attempts>1});
+    if(!lost){ if(attempts>1)emit('retry-ok',{qos,kind,attempts}); return{ok:true,attempts}; }
+    if(qos>=1&&attempts<max){
+      log({type:'RETRY',...meta,qos,note:`Paket verloren, Wiederholung ${attempts+1} von ${max}`});
+      emit('retry',{qos,kind});
+      await sleep(650*speed());
+    }else{
+      log({type:'DROP',...meta,qos,note:qos>=1?'Zustellung endgültig gescheitert':'Paket verloren, QoS 0 wiederholt nicht'});
+      emit('lost',{qos,kind});
+    }
+  }
+  return{ok:false,attempts};
+}
+
+async function connect(c){
+  if(c.connected)return true;
+  if(S.auth&&!c.cred){log({type:'REFUSED',from:c.name,note:'Verbindung abgelehnt: Login erforderlich'});return false;}
+  c.connected=true;
+  log({type:'CONNECT',from:c.name,note:c.will?'mit Last Will':''});
+  c.el.classList.remove('offline');scheduleRender();
+  await c.onConnect(c);
+  return true;
+}
+function disconnect(c,graceful=true){
+  if(!c.connected)return;
+  c.connected=false;c.subs.clear();
+  log({type:graceful?'DISCONNECT':'LOST',from:c.name,note:graceful?'sauber abgemeldet':'Verbindung ohne Abmeldung abgebrochen'});
+  c.el.classList.add('offline');
+  if(!graceful&&c.will){
+    const w=c.will();
+    log({type:'WILL',from:'Broker',topic:w.topic,payload:w.payload,qos:w.qos,retain:w.retain,note:'Last Will von '+c.name});
+    route(w.topic,w.payload,{qos:w.qos,retain:w.retain,kind:'will',from:null});
+  }
+  scheduleRender();
+}
+async function subscribe(c,filter,qos=1){
+  if(!c.connected)return;
+  log({type:'SUB',from:c.name,topic:filter,qos});
+  const r=await transmit(c.el,brokerEl,{label:'SUB',kind:'sys',qos:1,meta:{from:c.name,topic:filter}});
+  if(!r.ok||!c.connected)return;
+  c.subs.set(filter,qos);scheduleRender();
+  for(const [topic,m] of broker.retained){
+    if(match(filter,topic))deliver(c,topic,m.payload,{qos:Math.min(qos,m.qos),retain:true,kind:kindOf(topic),from:null});
+  }
+}
+function unsubscribe(c,filter){
+  if(!c.subs.has(filter))return;
+  c.subs.delete(filter);log({type:'UNSUB',from:c.name,topic:filter});scheduleRender();
+}
+async function publish(c,topic,payload,{qos=0,retain=false,kind}={}){
+  if(!c.connected)return{ok:false};
+  kind=kind||kindOf(topic);
+  log({type:'PUBLISH',from:c.name,topic,payload,qos,retain});
+  const r=await transmit(c.el,brokerEl,{label:payload,kind,qos,meta:{from:c.name,topic,payload}});
+  if(!r.ok)return r;
+  route(topic,payload,{qos,retain,kind,from:c});
+  return r;
+}
+function route(topic,payload,{qos,retain,kind,from}){
+  broker.count++;
+  if(retain){if(payload==='')broker.retained.delete(topic);else broker.retained.set(topic,{payload,qos});}
+  broker.seen.set(topic,{payload});
+  brokerEl.classList.remove('pulse');void brokerEl.offsetWidth;brokerEl.classList.add('pulse');
+  const targets=[];
+  for(const c of Object.values(clients)){
+    if(!c.connected)continue;
+    let q=-1;for(const [f,sq] of c.subs){if(match(f,topic))q=Math.max(q,sq);}
+    if(q>=0)targets.push([c,Math.min(q,qos)]);
+  }
+  broker.last={topic,payload,n:targets.length};
+  if(S.phoneSeen&&topic.endsWith('/status')&&!clients.phone.connected)S.offlineChanges++;
+  emit('route',{topic,payload,targets:targets.length,from,kind});
+  for(const [c,q] of targets)deliver(c,topic,payload,{qos:q,retain:false,kind,from});
+  scheduleRender();
+}
+async function deliver(c,topic,payload,opts){
+  const r=await transmit(brokerEl,c.el,{label:payload,kind:opts.kind,qos:opts.qos,meta:{from:'Broker',to:c.name,topic,payload}});
+  if(!r.ok||!c.connected)return;
+  log({type:'DELIVER',from:'Broker',to:c.name,topic,payload,qos:opts.qos,retain:opts.retain,dup:r.attempts>1});
+  try{c.onMessage(topic,payload,opts);}catch(e){console.error(e);}
+  emit('deliver',{c,topic,payload,retain:opts.retain,from:opts.from});
+}
+
+/* ---------- Geräte ---------- */
+const DEV=[
+  {id:'fl-lampe',name:'Flur-Lampe',room:'flur',dev:'lampe',type:'lampe',init:'aus'},
+  {id:'ku-lampe',name:'Küchen-Lampe',room:'kueche',dev:'lampe',type:'lampe',init:'aus'},
+  {id:'wz-lampe',name:'Wohnzimmer-Lampe',room:'wohnzimmer',dev:'lampe',type:'lampe',init:'aus'},
+  {id:'wz-heizung',name:'Heizung Wohnzimmer',room:'wohnzimmer',dev:'heizung',type:'heizung',init:'aus'},
+  {id:'sz-rollo',name:'Jalousie Schlafzimmer',room:'schlafzimmer',dev:'rollo',type:'rollo',init:'auf'},
+  {id:'fl-tuer',name:'Haustür-Schloss',room:'flur',dev:'tuer',type:'tuer',init:'zu'},
+  {id:'wz-temp',name:'Temperatursensor',room:'wohnzimmer',dev:'temperatur',type:'sensor',init:null},
+  {id:'fl-pir',name:'Bewegungsmelder',room:'flur',dev:'bewegung',type:'pir',init:null},
+];
+const VALID={lampe:['ein','aus'],heizung:['ein','aus'],rollo:['auf','zu'],tuer:['auf','zu']};
+const env={temp:19.0};
+DEV.forEach(d=>{
+  d.el=$('#dev-'+d.id);d.base=()=>T(d.room+'/'+d.dev);d.state=d.init;d.timer=null;
+  const c=new Client({id:d.id,name:d.name,el:d.el,dev:d});
+  c.defaultSubs=()=>{const s=[];if(VALID[d.type])s.push(d.base()+'/set');if(d.id==='fl-lampe')s.push(T('flur/bewegung/wert'));return s;};
+  c.will=()=>({topic:d.base()+'/verfuegbar',payload:'offline',qos:1,retain:true});
+  c.onConnect=async()=>{
+    const jobs=[publish(c,d.base()+'/verfuegbar','online',{qos:1,retain:true,kind:'sys'})];
+    for(const f of c.defaultSubs())jobs.push(subscribe(c,f,1));
+    if(d.state)jobs.push(publish(c,d.base()+'/status',d.state,{qos:1,retain:true,kind:'status'}));
+    await Promise.all(jobs);
+  };
+  c.onMessage=(topic,payload,opts)=>deviceMessage(d,c,topic,payload,opts);
+});
+function setDevState(d,v){
+  d.state=v;const el=d.el;
+  if(d.type==='lampe'){el.classList.toggle('on',v==='ein');$('#dim-'+d.id).classList.toggle('lit',v==='ein');}
+  if(d.type==='heizung')el.classList.toggle('on',v==='ein');
+  if(d.type==='rollo')$('#shade').style.setProperty('--r',v==='zu'?1:0);
+  if(d.type==='tuer'){el.classList.toggle('open',v==='auf');if(v==='zu')el.classList.remove('alarm');}
+  scheduleRender();
+}
+function deviceMessage(d,c,topic,payload,opts){
+  if(d.id==='fl-lampe'&&topic===T('flur/bewegung/wert')){if(payload==='1')motionLamp(d,c);return;}
+  if(topic!==d.base()+'/set')return;
+  if(!VALID[d.type]||!VALID[d.type].includes(payload)){log({type:'INFO',from:d.name,note:'Unbekannter Befehl „'+payload+'“ ignoriert'});return;}
+  clearTimeout(d.timer);setDevState(d,payload);
+  if(d.type==='tuer'&&payload==='auf'&&opts.from===clients.attacker){alarm('Alarm: Die Haustür wurde von einem unbekannten Gerät geöffnet.');d.el.classList.add('alarm');emit('attack_open',{});}
+  publish(c,d.base()+'/status',payload,{qos:1,retain:true,kind:'status'});
+}
+function motionLamp(d,c){
+  clearTimeout(d.timer);setDevState(d,'ein');
+  publish(c,d.base()+'/status','ein',{qos:1,retain:true,kind:'status'});
+  d.timer=setTimeout(()=>{if(c.connected){setDevState(d,'aus');publish(c,d.base()+'/status','aus',{qos:1,retain:true,kind:'status'});}},7000);
+}
+function physicalToggle(d){
+  const c=clients[d.id];if(!c.connected||!VALID[d.type])return;
+  const o=VALID[d.type];const v=d.state===o[0]?o[1]:o[0];
+  clearTimeout(d.timer);setDevState(d,v);
+  publish(c,d.base()+'/status',v,{qos:1,retain:true,kind:'status'});
+}
+function triggerMotion(){
+  const c=clients['fl-pir'];
+  const p=$('#person');p.classList.remove('walk');void p.getBoundingClientRect();p.classList.add('walk');
+  if(!c.connected)return;
+  const el=$('#dev-fl-pir');el.classList.remove('trig');void el.getBoundingClientRect();el.classList.add('trig');
+  publish(c,T('flur/bewegung/wert'),'1',{qos:0,kind:'sens'});
+}
+function alarm(t){const a=$('#alarm');a.textContent=t;a.hidden=false;clearTimeout(alarm._t);alarm._t=setTimeout(()=>{a.hidden=true;},9000);}
+
+/* Umgebung: Temperatur */
+setInterval(()=>{
+  const heat=DEV[3].state==='ein'&&clients['wz-heizung'].connected;
+  env.temp=Math.min(26,Math.max(17,env.temp+(heat?0.5:-0.15)));
+  const c=clients['wz-temp'];
+  $('#tempval').textContent=c.connected?env.temp.toFixed(1)+'°':'–';
+  if(c.connected){publish(c,T('wohnzimmer/temperatur/wert'),env.temp.toFixed(1),{qos:0,retain:true,kind:'sens'});}
+  if(heat&&env.temp>=22)emit('warm',{});
+},3000);
+
+/* ---------- Smartphone ---------- */
+const TILES=[
+  {key:'wohnzimmer/lampe',label:'Wohnzimmer',type:'lampe',icon:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>'},
+  {key:'kueche/lampe',label:'Küche',type:'lampe',icon:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>'},
+  {key:'flur/lampe',label:'Flur',type:'lampe',icon:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>'},
+  {key:'flur/tuer',label:'Haustür',type:'tuer',icon:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'},
+  {key:'wohnzimmer/heizung',label:'Heizung',type:'heizung',icon:'<path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z"/>'},
+  {key:'schlafzimmer/rollo',label:'Jalousien',type:'rollo',icon:'<path d="M4 4h16M6 8h12M6 12h12M6 16h12M12 16v4"/>'},
+];
+const pstate={};TILES.forEach(t=>pstate[t.key]={status:null,avail:null,pending:null,noans:false,timer:null});
+pstate['wohnzimmer/temperatur']={status:null,avail:null,value:null};
+const phoneInbox=[];
+const phone=new Client({id:'phone',name:'Smartphone-App',el:$('#phone')});
+phone.defaultSubs=()=>[T('+/+/status'),T('+/+/wert'),T('+/+/verfuegbar')];
+phone.onConnect=async()=>{S.phoneSeen=true;await Promise.all(phone.defaultSubs().map(f=>subscribe(phone,f,1)));};
+phone.onMessage=(topic,payload,opts)=>{
+  phoneInbox.unshift({topic,payload,retain:opts.retain});if(phoneInbox.length>6)phoneInbox.pop();
+  const parts=topic.slice(S.prefix.length+1).split('/');
+  if(parts.length===3){
+    const key=parts[0]+'/'+parts[1],st=pstate[key];
+    if(st){
+      if(parts[2]==='status'){st.status=payload;st.pending=null;st.noans=false;clearTimeout(st.timer);}
+      if(parts[2]==='verfuegbar')st.avail=payload;
+      if(parts[2]==='wert')st.value=payload;
+    }
+  }
+  scheduleRender();
+};
+function phoneCmd(key,value){
+  const st=pstate[key];if(!st||!phone.connected)return;
+  st.pending=value;st.noans=false;clearTimeout(st.timer);
+  st.timer=setTimeout(()=>{if(st.pending){st.pending=null;st.noans=true;scheduleRender();}},4500*speed()+2000);
+  scheduleRender();
+  publish(phone,T(key+'/set'),value,{qos:S.defQos,kind:'cmd'});
+}
+function renderTiles(){
+  const off=!phone.connected;
+  const html=TILES.map(t=>{
+    const st=pstate[t.key];let sub='';let cls='tile';
+    let main=st.status;
+    if(t.type==='lampe'||t.type==='heizung'){main=st.status==='ein'?'An':st.status==='aus'?'Aus':'…';if(st.status==='ein')cls+=' on';}
+    if(t.type==='tuer'){main=st.status==='zu'?'Verriegelt':st.status==='auf'?'Offen':'…';if(st.status==='auf')cls+=' open';}
+    if(t.type==='rollo'){main=st.status==='auf'?'Offen':st.status==='zu'?'Geschlossen':'…';}
+    if(t.type==='heizung'){const ts=pstate['wohnzimmer/temperatur'];sub=(ts.avail==='offline'||ts.value==null)?'Sensor offline':Number(ts.value).toFixed(1).replace('.',',')+' °C';}
+    if(st.pending){cls+=' pending';sub='sendet „'+st.pending+'“ …';}
+    if(st.noans){cls+=' noans';sub='keine Antwort vom Gerät';}
+    const dis=off||st.avail==='offline';
+    if(st.avail==='offline'&&!st.pending&&!st.noans)sub='Gerät offline';
+    return `<button class="${cls}" data-fk="t-${t.key}" data-key="${t.key}" ${dis?'disabled':''} aria-label="${t.label}: ${main}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${t.icon}</svg><span><b>${t.label}</b><small>${esc(main)}</small>${sub?`<small>${esc(sub)}</small>`:''}</span></button>`;
+  }).join('');
+  setHTML($('#tiles'),html);
+}
+$('#tiles').addEventListener('click',e=>{
+  const b=e.target.closest('.tile');if(!b)return;const key=b.dataset.key,t=TILES.find(x=>x.key===key),st=pstate[key];
+  const o=VALID[t.type];const v=st.status===o[0]?o[1]:o[0];phoneCmd(key,v);
+});
+$('#seg-qos').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.defQos=+b.dataset.q;$$('#seg-qos button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));});
+$('#ex-qos').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.exQos=+b.dataset.q;$$('#ex-qos button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));});
+$$('.app-tabs button').forEach(b=>b.addEventListener('click',()=>{
+  $$('.app-tabs button').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
+  $('#app-steuern').hidden=b.dataset.app!=='steuern';$('#app-experte').hidden=b.dataset.app!=='experte';
+}));
+$('#ex-send').addEventListener('click',()=>{
+  const t=$('#ex-topic').value.trim();if(!t||!phone.connected)return;
+  publish(phone,t,$('#ex-payload').value,{qos:S.exQos,retain:$('#ex-retain').checked});
+});
+$('#ex-addsub').addEventListener('click',()=>{const f=$('#ex-newsub').value.trim();if(f&&phone.connected){subscribe(phone,f,1);$('#ex-newsub').value='';}});
+$('#ex-subs').addEventListener('click',e=>{const b=e.target.closest('[data-unsub]');if(b)unsubscribe(phone,b.dataset.unsub);});
+$('#fly').addEventListener('click',()=>{
+  if(phone.connected){disconnect(phone,true);}else{connect(phone);}
+});
+function renderPhoneExtras(){
+  const on=phone.connected;
+  $('#fly').setAttribute('aria-pressed',String(!on));$('#airplane').hidden=on;
+  const pc=$('#phone-conn');pc.classList.toggle('off',!on);$('span',pc).textContent=on?'verbunden mit Broker':'offline';
+  setHTML($('#ex-subs'),[...phone.subs].map(([f,q])=>`<li><code>${esc(f)}</code><span class="chip">QoS ${q}</span><button class="x" data-unsub="${esc(f)}" data-fk="u-${esc(f)}" aria-label="Abo ${esc(f)} entfernen">×</button></li>`).join('')||'<li class="muted">keine Abonnements</li>');
+  setHTML($('#ex-inbox'),phoneInbox.map(m=>`<li><code>${esc(m.topic.slice(S.prefix.length+1))}</code><b>${esc(m.payload)}</b>${m.retain?'<span class="chip r">R</span>':''}</li>`).join('')||'<li class="muted">noch nichts</li>');
+  const sig=S.loss<.1?4:S.loss<.3?3:S.loss<.5?2:1;$('#sig').dataset.bars=sig;
+}
+
+/* ---------- Angreifer ---------- */
+const attacker=new Client({id:'attacker',name:'Unbekanntes Gerät',el:$('#attacker'),cred:false});
+let aLines=[],aSeen=0;
+function aOut(t,c=''){aLines.push(`<div class="${c}">${esc(t)}</div>`);if(aLines.length>40)aLines.shift();const o=$('#a-out');o.innerHTML=aLines.join('');o.scrollTop=o.scrollHeight;}
+attacker.onMessage=(topic,payload,opts)=>{
+  const p=topic.split('/')[0];
+  if(S.known!==p){S.known=p;$('#a-known').textContent=p;aOut(`Mitgelesen: „${topic}“. Das Präfix „${p}“ ist jetzt bekannt.`,'ok');}
+  else if(++aSeen<=3||opts.kind==='cmd')aOut(`Mitgelesen: ${topic} = ${payload}`);
+};
+attacker.onConnect=async()=>{document.body.dataset.atk='1';$('#atk-s').textContent='mit dem Broker verbunden';$('#attacker').classList.add('live');};
+const _disc=disconnect;
+async function attackConnect(){
+  if(attacker.connected)return true;
+  aOut('Verbindung zum Broker ohne Zugangsdaten …');
+  const ok=await connect(attacker);
+  if(!ok){aOut('Abgelehnt: Der Broker verlangt Benutzername und Passwort.','bad');emit('attack_blocked',{how:'auth'});}
+  return ok;
+}
+$('#a-listen').addEventListener('click',async()=>{
+  if(!await attackConnect())return;
+  aOut('Verbunden. Abonniere „#“, also alle Themen …');
+  await subscribe(attacker,'#',0);
+});
+$('#a-door').addEventListener('click',async()=>{
+  if(!await attackConnect())return;
+  const t=S.known+'/flur/tuer/set';aOut(`Sende ${t} = auf`);
+  await publish(attacker,t,'auf',{qos:1,kind:'attack'});
+});
+
+/* ---------- Praktische Aktionen: Inspektor ---------- */
+let sel=null;
+$('#house').addEventListener('click',e=>{const g=e.target.closest('.dev');if(g){sel=g.dataset.id;updateSel();scheduleRender();setDock('device');}});
+$('#house').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const g=e.target.closest('.dev');if(g){e.preventDefault();sel=g.dataset.id;updateSel();scheduleRender();setDock('device');}}});
+function updateSel(){DEV.forEach(d=>d.el.classList.toggle('sel',d.id===sel));}
+function renderInspector(){
+  const box=$('#inspector');
+  if(!sel){setHTML(box,'<h3>Geräte-Inspektor</h3><p class="meta">Wähle im Haus ein Gerät aus. Du siehst dann seine Abonnements und kannst es physisch bedienen oder vom Strom trennen.</p>');return;}
+  const d=DEV.find(x=>x.id===sel),c=clients[d.id];
+  const subs=[...c.subs].map(([f,q])=>`<li><code>${esc(f)}</code><span class="chip">QoS ${q}</span><button class="x" data-unsub="${esc(f)}" data-fk="iu-${esc(f)}" aria-label="Abo ${esc(f)} entfernen">×</button></li>`).join('')||'<li class="muted">keine Abonnements</li>';
+  const pubs=[];
+  if(d.type==='sensor')pubs.push(d.base()+'/wert');
+  if(d.type==='pir')pubs.push(d.base()+'/wert');
+  if(VALID[d.type])pubs.push(d.base()+'/status');
+  pubs.push(d.base()+'/verfuegbar');
+  const w=c.will();
+  const acts=[];
+  if(VALID[d.type])acts.push(`<button class="btn sm" data-act="phys" data-fk="a-phys" ${c.connected?'':'disabled'}>Am Gerät schalten</button>`);
+  if(d.type==='pir')acts.push(`<button class="btn sm" data-act="motion" data-fk="a-mo" ${c.connected?'':'disabled'}>Bewegung auslösen</button>`);
+  acts.push(c.connected?`<button class="btn sm warn" data-act="crash" data-fk="a-cr">Stromausfall</button>`:`<button class="btn sm primary" data-act="power" data-fk="a-pw">Strom einschalten</button>`);
+  if(VALID[d.type]||d.id==='fl-lampe')acts.push(`<button class="btn sm" data-act="restore" data-fk="a-re" ${c.connected?'':'disabled'}>Standard-Abos wiederherstellen</button>`);
+  setHTML(box,`<h3>${esc(d.name)} <span class="chip">${esc(d.id)}</span></h3>
+    <div class="meta"><span class="dot ${c.connected?'':'off'}"></span> ${c.connected?'verbunden':'offline'}${d.state?`, Zustand: <b>${esc(d.state)}</b>`:''}</div>
+    <div class="act">${acts.join('')}</div>
+    <h4>Abonniert</h4><ul class="list">${subs}</ul>
+    <h4>Veröffentlicht</h4><ul class="list">${pubs.map(p=>`<li><code>${esc(p)}</code></li>`).join('')}</ul>
+    <h4>Last Will</h4><ul class="list"><li><code>${esc(w.topic)}</code> <b>${w.payload}</b> <span class="chip r">R</span></li></ul>`);
+}
+$('#inspector').addEventListener('click',e=>{
+  if(!sel)return;const d=DEV.find(x=>x.id===sel),c=clients[d.id];
+  const u=e.target.closest('[data-unsub]');if(u){unsubscribe(c,u.dataset.unsub);return;}
+  const a=e.target.closest('[data-act]');if(!a)return;
+  switch(a.dataset.act){
+    case'phys':physicalToggle(d);break;
+    case'motion':triggerMotion();break;
+    case'crash':disconnect(c,false);break;
+    case'power':connect(c);break;
+    case'restore':for(const f of c.defaultSubs())if(!c.subs.has(f))subscribe(c,f,1);break;
+  }
+});
+$('#walk').addEventListener('click',triggerMotion);
+
+/* ---------- Broker-Karte, Mitschnitt, Einblick ---------- */
+function renderBrokerCard(){
+  $('#st-cl').textContent=Object.values(clients).filter(c=>c.connected&&c.id!=='attacker').length;
+  $('#st-msg').textContent=broker.count;$('#st-ret').textContent=broker.retained.size;
+  const l=broker.last;
+  setHTML($('#ticker'),l?`<code>${esc(l.topic)} = ${esc(l.payload)}</code>${l.n?`Verteilt an ${l.n} ${l.n===1?'Abonnent':'Abonnenten'}`:'<span class="none">Niemand hat dieses Thema abonniert. Die Nachricht verpufft.</span>'}`:'<span style="opacity:.75">Hier siehst du, an wie viele Abonnenten die letzte Nachricht verteilt wurde.</span>');
+  const a=$('#access');a.classList.toggle('sec',S.auth);$('#access-t').textContent=S.auth?'Zugang mit Login: nur bekannte Clients':'Zugang offen: jeder darf sich verbinden';
+  $('#atk-s').textContent=attacker.connected?'mit dem Broker verbunden':'wartet in der Werkstatt auf Einsatz';
+  $('#attacker').classList.toggle('live',attacker.connected);
+  updateAtk();
+}
+const BADGE={PUBLISH:'PUBLISH',DELIVER:'DELIVER',SUB:'SUBSCRIBE',UNSUB:'UNSUBSCRIBE',CONNECT:'CONNECT',DISCONNECT:'DISCONNECT',LOST:'ABBRUCH',WILL:'LAST WILL',DROP:'VERLOREN',RETRY:'WIEDERHOLT',REFUSED:'ABGELEHNT',INFO:'INFO',SYS:'SYSTEM'};
+function renderLog(){
+  if(S.paused)return;
+  const f=S.filter.trim();
+  const rows=LOG.filter(e=>!f||(e.topic&&match(f,e.topic))).slice(0,120).map(e=>{
+    const t=e.t.toLocaleTimeString('de-DE');
+    let who=e.type==='DELIVER'?`Broker → ${e.to}`:e.type==='PUBLISH'?`${e.from} → Broker`:(e.from||'');
+    if(e.note&&e.type!=='DELIVER'&&e.type!=='PUBLISH')who=(e.from||'')+(e.to?' → '+e.to:'');
+    const chips=[];
+    if(e.qos!=null&&(e.type==='PUBLISH'||e.type==='DELIVER'||e.type==='SUB'))chips.push(`<span class="chip">QoS ${e.qos}</span>`);
+    if(e.retain)chips.push('<span class="chip r">R</span>');
+    if(e.dup)chips.push('<span class="chip dup">DUP</span>');
+    return `<div class="lr"><span class="tm">${t}</span><span class="bd b-${e.type}">${BADGE[e.type]||e.type}</span><span class="who">${esc(who)}</span><code class="tp">${esc(e.topic||'')}</code><span class="pl">${e.payload!=null?`<code>${esc(e.payload)}</code>`:''}${e.note?`<span class="muted"> ${esc(e.note)}</span>`:''}</span><span class="fl">${chips.join(' ')}</span></div>`;
+  }).join('');
+  setHTML($('#log'),rows||'<div class="lr" style="display:block">Noch keine passenden Nachrichten.</div>');
+}
+function renderBrokerTab(){
+  if($('#pane-broker').hidden||!dockOpen())return;
+  const cl=Object.values(clients).map(c=>`<div class="cl"><div class="nm"><span class="dot ${c.connected?'':'off'}"></span>${esc(c.name)} <span class="chip">${esc(c.id)}</span></div><div class="sb2">${[...c.subs].map(([f,q])=>`<span class="chip">${esc(f)} · QoS ${q}</span>`).join('')||'<span class="muted">keine Abonnements</span>'}</div></div>`).join('');
+  setHTML($('#clients'),cl);
+  const root={k:{},v:null};
+  for(const [t,v] of broker.seen){let n=root;for(const s of t.split('/')){n.k[s]=n.k[s]||{k:{},v:null};n=n.k[s];}n.v={payload:v.payload,r:broker.retained.has(t)};}
+  const draw=n=>Object.keys(n.k).sort().map(s=>{const m=n.k[s];return `<li><span class="seg-n">${esc(s)}</span>${m.v?`<span class="val">${esc(m.v.payload)}</span>${m.v.r?' <span class="chip r">R</span>':''}`:''}${Object.keys(m.k).length?`<ul>${draw(m)}</ul>`:''}</li>`;}).join('');
+  setHTML($('#tree'),draw(root)||'<li class="muted">noch keine Themen</li>');
+}
+function renderAll(){renderTiles();renderPhoneExtras();renderInspector();renderBrokerCard();renderBrokerTab();}
+
+$('#flt').addEventListener('input',e=>{S.filter=e.target.value;renderLog();emit('filter',{});});
+$('#pause').addEventListener('click',e=>{S.paused=!S.paused;e.currentTarget.setAttribute('aria-pressed',String(S.paused));e.currentTarget.textContent=S.paused?'Fortsetzen':'Anhalten';if(!S.paused)renderLog();});
+$('#clearlog').addEventListener('click',()=>{LOG.length=0;renderLog();});
+
+/* ---------- Werkstatt ---------- */
+$('#loss').addEventListener('input',e=>{S.loss=e.target.value/100;$('#loss-v').textContent=e.target.value+' %';scheduleRender();});
+$('#auth').addEventListener('change',e=>{
+  S.auth=e.target.checked;
+  if(S.auth&&attacker.connected){log({type:'INFO',from:'Broker',note:'Client ohne Login getrennt'});disconnect(attacker,false);aOut('Der Broker hat die Verbindung getrennt: Login erforderlich.','bad');}
+  scheduleRender();
+});
+$('#prefix-set').addEventListener('click',()=>changePrefix($('#prefix').value));
+$('#prefix').addEventListener('keydown',e=>{if(e.key==='Enter')changePrefix(e.target.value);});
+async function changePrefix(p){
+  p=p.trim();const msg=$('#prefix-msg');
+  if(!/^[A-Za-z0-9_-]{1,40}$/.test(p)){msg.textContent='Erlaubt sind Buchstaben, Ziffern, _ und - (höchstens 40 Zeichen).';return;}
+  if(p===S.prefix){msg.textContent='Dieses Präfix ist bereits aktiv.';return;}
+  S.prefix=p;broker.retained.clear();broker.seen.clear();
+  log({type:'INFO',from:'Broker',note:'Neues Präfix, gemerkte Nachrichten gelöscht'});
+  msg.textContent=`Neues Präfix „${p}“ aktiv. Alle Geräte melden sich neu an.`;
+  for(const c of Object.values(clients)){if(c.id==='attacker'||!c.connected)continue;c.subs.clear();await c.onConnect(c);}
+  refreshPrefixUI();scheduleRender();
+}
+function refreshPrefixUI(){
+  $('#dl-topics').innerHTML=DEV.filter(d=>VALID[d.type]).map(d=>`<option value="${esc(d.base()+'/set')}">`).join('');
+  $('#ex-topic').value=T('wohnzimmer/lampe/set');
+  $('#ex-newsub').placeholder='z. B. '+S.prefix+'/#';
+  $('#flt').placeholder='Filter wie bei einem Abonnement, z. B. '+S.prefix+'/+/lampe/set';
+  renderMissions();
+}
+$('#reset-sim').addEventListener('click',()=>location.reload());
+$('#reset-prog').addEventListener('click',()=>{DONE.clear();saveDone();renderMissions();});
+
+/* ---------- Missionen ---------- */
+const P={lost0:false,retry1:false};
+const MISSIONS=[
+ {id:'m1',xp:100,title:'Der erste Befehl',
+  task:'Schalte in der App die Wohnzimmer-Lampe ein. Verfolge, wie der Befehl über den Broker zur Lampe läuft und die Lampe ihren neuen Zustand zurückmeldet.',
+  hint:()=>'Tippe in der App auf die Kachel „Wohnzimmer“. Mit „Zeitlupe“ oben rechts siehst du jeden Schritt.',
+  merke:'Die App (Publisher) sendet an ein Thema, nicht an die Lampe selbst. Der Broker leitet die Nachricht an alle weiter, die das Thema abonniert haben. Die Lampe meldet ihren Zustand auf einem eigenen Status-Thema zurück. So sprechen App und Gerät in beide Richtungen miteinander.',
+  test:(t,d)=>t==='deliver'&&d.c.id==='phone'&&d.topic===T('wohnzimmer/lampe/status')&&d.payload==='ein'},
+ {id:'m2',xp:100,title:'Ohne Abo kein Empfang',
+  task:'Wähle im Haus die Küchen-Lampe aus und entferne ihr Abonnement. Schalte sie danach in der App ein und beobachte, was der Broker meldet.',
+  hint:()=>'Klicke im Haus auf die Küchen-Lampe. Im Tab „Gerät“ entfernst du das Abo mit ×. Mit „Standard-Abos wiederherstellen“ funktioniert sie wieder.',
+  merke:'Sender und Empfänger kennen sich nicht. Der Broker liefert nur an Abonnenten aus. Hat niemand ein Thema abonniert, verpufft die Nachricht. Diese Entkopplung macht MQTT flexibel.',
+  test:(t,d)=>t==='route'&&d.topic===T('kueche/lampe/set')&&d.targets===0&&d.from&&d.from.id==='phone'},
+ {id:'m3',xp:100,title:'Platzhalter im Filter',
+  task:'Schalte mehrere Lampen und filtere den Mitschnitt so, dass alle Lampen-Befehle gleichzeitig erscheinen. Nutze den Platzhalter +.',
+  hint:()=>`Schalte zwei Lampen in der App. Öffne den Tab „Mitschnitt“ und gib ein: ${S.prefix}/+/lampe/set`,
+  merke:'+ steht für genau eine Ebene, # für beliebig viele Ebenen am Ende. Mit Platzhaltern abonniert man viele Themen auf einmal. Die App nutzt zum Beispiel haus1/+/+/status für alle Statusmeldungen im Haus.',
+  test:()=>{const f=S.filter;if(!f.includes('+'))return false;return new Set(LOG.filter(e=>e.topic&&match(f,e.topic)).map(e=>e.topic)).size>=2;}},
+ {id:'m4',xp:120,title:'Heizung und Sensor',
+  task:'Schalte die Heizung im Wohnzimmer ein, bis der Temperatursensor 22 °C meldet.',
+  hint:()=>'Der Sensor sendet alle 3 Sekunden einen Messwert. Bis 22 °C dauert es etwa 20 Sekunden.',
+  merke:'Sensoren veröffentlichen Messwerte, Aktoren abonnieren Befehle. Die App abonniert die Messwerte und zeigt sie an. So entsteht ein einfacher Regelkreis.',
+  test:t=>t==='warm'},
+ {id:'m5',xp:120,title:'Automatik im Flur',
+  task:'Schicke eine Person durch den Flur. Der Bewegungsmelder meldet das, und die Flur-Lampe geht ganz ohne App an.',
+  hint:()=>'Nutze den Button „Person durch den Flur schicken“ unter dem Haus oder wähle den Bewegungsmelder im Haus aus.',
+  merke:'Geräte können auch Themen anderer Geräte abonnieren. Die Flur-Lampe hört auf den Bewegungsmelder. So entsteht eine Automatisierung ohne zentrale Steuerung.',
+  test:(t,d)=>t==='deliver'&&d.c.id==='fl-lampe'&&d.topic===T('flur/bewegung/wert')},
+ {id:'m6',xp:150,title:'Der Broker merkt sich Zustände',
+  task:'Aktiviere in der App den Flugmodus. Schalte dann im Haus die Küchen-Lampe am Gerät um und beende den Flugmodus. Die App kennt den neuen Zustand sofort.',
+  hint:()=>'Das Flugzeug-Symbol sitzt oben rechts im Handy. „Am Gerät schalten“ findest du im Tab „Gerät“, wenn die Lampe ausgewählt ist.',
+  merke:'Retained-Nachrichten (R) speichert der Broker pro Thema. Wer ein Thema neu abonniert, bekommt sofort den letzten Wert. Das ist ideal für Zustände, weil Geräte sich nicht ständig neu melden müssen.',
+  test:(t,d)=>t==='deliver'&&d.c.id==='phone'&&d.retain&&S.offlineChanges>0&&d.topic.endsWith('/status')},
+ {id:'m7',xp:150,title:'Wackelige Verbindung',
+  task:'Setze in der Werkstatt den Paketverlust auf mindestens 50 %. Sende Befehle mit QoS 0, bis einer verloren geht (✕). Wiederhole das mit QoS 1: Der Befehl kommt trotz Verlust an.',
+  hint:()=>'In der App wählst du oben QoS 0 oder QoS 1. Bei QoS 1 wiederholt der Absender, bis das Paket durchkommt.',
+  merke:'QoS 0 heißt höchstens einmal: Das Paket kann verloren gehen. QoS 1 heißt mindestens einmal: Der Absender wiederholt (DUP), bis die Bestätigung eintrifft, und es kann doppelt ankommen. QoS 2 (genau einmal) gibt es zusätzlich.',
+  test:(t,d)=>{if(t==='lost'&&d.qos===0&&d.kind==='cmd')P.lost0=true;if(t==='retry-ok'&&d.qos>=1&&d.kind==='cmd')P.retry1=true;return P.lost0&&P.retry1;}},
+ {id:'m8',xp:120,title:'Last Will',
+  task:'Simuliere einen Stromausfall beim Temperatursensor. Der Broker meldet das Gerät automatisch als offline.',
+  hint:()=>'Wähle den Sensor im Wohnzimmer aus und klicke im Tab „Gerät“ auf „Stromausfall“.',
+  merke:'Beim Verbinden hinterlegt ein Client einen Last Will. Bricht die Verbindung ab, ohne dass sich der Client abmeldet, veröffentlicht der Broker diese Nachricht. So erkennen andere Geräte Ausfälle.',
+  test:(t,d)=>t==='route'&&d.kind==='will'&&d.topic===T('wohnzimmer/temperatur/verfuegbar')},
+ {id:'m9',xp:100,title:'Angriff auf das Haus',
+  task:'Schicke in der Werkstatt den Angreifer los: erst mithören, dann die Haustür öffnen.',
+  hint:()=>'Der Angreifer kennt nur das Standard-Präfix „haus1“. Wenn es nicht klappt, hast du das Präfix vielleicht schon geändert.',
+  merke:'Ein offener Broker erlaubt jedem, mitzulesen und Befehle zu senden. Wer ein Thema erraten oder mitlesen kann, steuert das Haus.',
+  test:t=>t==='attack_open'},
+ {id:'m10',xp:150,title:'Haus absichern',
+  task:'Verhindere den Angriff und starte ihn erneut: Aktiviere den Login am Broker oder wähle ein geheimes Präfix.',
+  hint:()=>'Probiere beide Wege. Mit geheimem Präfix kann der Angreifer es durch Mithören trotzdem herausfinden. Nur der Login hält ihn ganz draußen.',
+  merke:'Sicherheit entsteht durch mehrere Maßnahmen: Authentifizierung (Login), Zugriffsrechte pro Thema und verschlüsselte Verbindungen (TLS). Ein geheimes Thema allein ist nur Sicherheit durch Geheimhaltung.',
+  test:t=>t==='attack_blocked'},
+];
+const LEVELS=[[0,'Neugierig'],[200,'Publisher'],[500,'Subscriber'],[800,'Broker-Profi'],[1100,'IoT-Architekt']];
+const MAXXP=MISSIONS.reduce((a,m)=>a+m.xp,0);
+let DONE=new Set();
+try{DONE=new Set(JSON.parse(localStorage.getItem('mqttlab.done')||'[]'));}catch(e){}
+function saveDone(){try{localStorage.setItem('mqttlab.done',JSON.stringify([...DONE]));}catch(e){}}
+function xpNow(){return MISSIONS.filter(m=>DONE.has(m.id)).reduce((a,m)=>a+m.xp,0);}
+function emit(type,data={}){
+  if(type==='route'&&data.from===attacker&&data.targets===0){aOut('Niemand hat die Nachricht empfangen. Das Präfix stimmt nicht.','bad');emit('attack_blocked',{how:'prefix'});}
+  if(type==='route'&&data.from===attacker&&data.targets>0)aOut('Der Broker hat die Nachricht zugestellt.','ok');
+  for(const m of MISSIONS){if(!DONE.has(m.id)&&m.test(type,data))complete(m);}
+}
+function complete(m){
+  DONE.add(m.id);saveDone();renderMissions();
+  const t=$('#toast');
+  let pr='';if(m.id==='m2'&&S.pred){pr=S.pred==='b'?'<p>Deine Vermutung stimmte: Die Nachricht verpufft.</p>':'<p>Deine Vermutung war anders. Normalerweise verpufft die Nachricht. Nur mit Retain merkt sich der Broker sie (siehe Mission 6).</p>';}
+  t.innerHTML=`<h3>Mission geschafft: ${esc(m.title)} (+${m.xp} XP)</h3>${pr}<div class="merke"><strong>Merke</strong>${esc(m.merke)}</div>`;
+  t.hidden=false;clearTimeout(complete._t);complete._t=setTimeout(()=>{t.hidden=true;},16000);
+}
+$('#toast').addEventListener('click',()=>{$('#toast').hidden=true;});
+function updateAtk(){
+  const cur=MISSIONS.find(m=>!DONE.has(m.id));
+  const show=attacker.connected||DONE.has('m9')||!cur||cur.id==='m9'||cur.id==='m10';
+  document.body.dataset.atk=show?'1':'';
+}
+function renderMissions(){
+  const cur=MISSIONS.find(m=>!DONE.has(m.id));
+  updateAtk();
+  const xp=xpNow();let lvl=LEVELS[0][1];for(const [x,n] of LEVELS)if(xp>=x)lvl=n;
+  $('#lvl').textContent=lvl;$('#xpnum').textContent=xp+' XP';$('#xpbar').style.width=(xp/MAXXP*100)+'%';
+  $('#cnt-m').textContent=DONE.size+'/'+MISSIONS.length;
+  const idx=cur?MISSIONS.indexOf(cur)+1:MISSIONS.length;document.body.dataset.spot=cur?cur.id:'';
+  $('#strip').innerHTML=cur?`<div><div class="kicker">Mission ${idx} von ${MISSIONS.length}</div><h2>${esc(cur.title)}</h2><p>${esc(cur.task)}</p><details class="hint"><summary>Tipp anzeigen</summary>${esc(cur.hint())}</details></div><div><button class="btn" id="to-m">Alle Missionen</button></div><div class="pips">${MISSIONS.map(m=>`<i class="${DONE.has(m.id)?'done':m===cur?'cur':''}"></i>`).join('')}</div>`
+   :`<div><div class="kicker">Alle Missionen geschafft</div><h2>Du bist IoT-Architekt:in</h2><p>Experimentiere frei weiter: Ändere das Präfix, probiere Wildcard-Abos in der App oder veröffentliche eigene Nachrichten im Tab „Experte“.</p></div><div><button class="btn" id="to-m">Alle Missionen</button></div><div class="pips">${MISSIONS.map(()=>'<i class="done"></i>').join('')}</div>`;
+  const tb=$('#to-m');if(tb)tb.onclick=()=>setDock('missions');
+  $('#mlist').innerHTML=MISSIONS.map((m,i)=>{
+    const done=DONE.has(m.id);
+    return `<article class="m ${done?'done':m===cur?'cur':''}"><h3><span class="st" aria-hidden="true">${done?'✓':i+1}</span>${esc(m.title)}<span class="xpb">${m.xp} XP</span></h3><p>${esc(m.task)}</p><details><summary>Tipp</summary>${esc(m.hint())}</details>${done?`<div class="merke"><strong>Merke</strong>${esc(m.merke)}</div>`:''}</article>`;
+  }).join('');
+}
+
+/* ---------- Tabs, Thema, Zeitlupe ---------- */
+const TABS=['missions','device','log','broker','lab','terms'];
+let curTab='missions';
+const dockOpen=()=>document.body.dataset.dock==='open';
+function updateTabs(){$$('.tabs [data-tab]').forEach(b=>b.setAttribute('aria-selected',String(dockOpen()&&b.dataset.tab===curTab)));}
+function fitStage(){
+  if(innerWidth<=1060)return;
+  const r=$('#stage').getBoundingClientRect(),avail=innerHeight-$('#dock').getBoundingClientRect().height;
+  if(r.bottom>avail||r.top<0)window.scrollTo({top:scrollY+r.top-8,behavior:reduceMotion?'auto':'smooth'});
+}
+function setDock(tab,toggle=false){
+  if(toggle&&dockOpen()&&curTab===tab){document.body.dataset.dock='closed';updateTabs();return;}
+  curTab=tab;document.body.dataset.dock='open';
+  TABS.forEach(n=>{$('#pane-'+n).hidden=n!==tab;});
+  updateTabs();
+  if(tab==='log')renderLog();if(tab==='broker')renderBrokerTab();
+  setTimeout(fitStage,80);
+}
+$$('.tabs [data-tab]').forEach(b=>b.addEventListener('click',()=>setDock(b.dataset.tab,true)));
+$('#dock-x').addEventListener('click',()=>{if(dockOpen()){document.body.dataset.dock='closed';updateTabs();}else setDock(curTab);});
+document.body.dataset.dock='closed';
+$('#slow').addEventListener('click',e=>{S.slow=!S.slow;e.currentTarget.setAttribute('aria-pressed',String(S.slow));});
+$('#theme').addEventListener('click',e=>{
+  const dark=getComputedStyle(document.documentElement).getPropertyValue('--surface').trim()!=='#ffffff';
+  document.documentElement.dataset.theme=dark?'light':'dark';e.currentTarget.textContent=dark?'Dunkel':'Hell';
+});
+(function initThemeLabel(){const dark=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches;$('#theme').textContent=dark?'Hell':'Dunkel';})();
+
+
+/* ---------- Einführung für Einsteiger ---------- */
+const introEl=$('#intro');
+function netSVG(n,hub){
+  const cx=140,cy=105,r=80;
+  const pts=[...Array(n)].map((_,i)=>{const a=-Math.PI/2+i*2*Math.PI/n;return[cx+r*Math.cos(a),cy+r*Math.sin(a)];});
+  let l='';
+  if(hub){pts.forEach(p=>{l+=`<line x1="${cx}" y1="${cy}" x2="${p[0].toFixed(1)}" y2="${p[1].toFixed(1)}"/>`;});}
+  else{for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)l+=`<line x1="${pts[i][0].toFixed(1)}" y1="${pts[i][1].toFixed(1)}" x2="${pts[j][0].toFixed(1)}" y2="${pts[j][1].toFixed(1)}"/>`;}
+  const nd=pts.map(p=>`<circle class="nd" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="9"/>`).join('');
+  const hb=hub?`<rect class="hub" x="${cx-27}" y="${cy-13}" width="54" height="26" rx="9"/><text class="hubt" x="${cx}" y="${cy+4}">Broker</text>`:'';
+  return `<svg viewBox="0 0 280 210" aria-hidden="true">${l}${nd}${hb}</svg>`;
+}
+const PRED={a:'Der Absender bekommt eine Fehlermeldung.',b:'Die Nachricht geht verloren, niemand merkt etwas.',c:'Der Broker hebt sie auf, bis jemand das Thema abonniert.'};
+const ANAT=[
+  ['haus1','Präfix: der Name deines Hauses. Er sorgt dafür, dass sich verschiedene Häuser nicht in die Quere kommen.'],
+  ['wohnzimmer','Ebene 2: der Raum.'],
+  ['lampe','Ebene 3: das Gerät.'],
+  ['set','Ebene 4: die Art der Nachricht. „set“ ist ein Befehl an das Gerät, „status“ die Rückmeldung des Geräts.']
+];
+const STEPS=[
+ {html:()=>`<h2 id="in-title" tabindex="-1">Wie spricht deine App mit der Lampe?</h2>
+  <p>Ein Smarthome hat viele Geräte. Wenn jedes Gerät jedes andere direkt kennen müsste, würde es schnell unübersichtlich. Verschiebe den Regler und vergleiche beide Möglichkeiten.</p>
+  <label for="nn" style="display:block;font-weight:600">Anzahl der Geräte: <b id="nn-v">5</b></label>
+  <input type="range" id="nn" min="3" max="10" value="5" style="width:100%;accent-color:var(--accent)">
+  <div class="nets"><figure><span id="net-a"></span><figcaption>Jeder mit jedem: <b id="cnt-a">10</b> Leitungen</figcaption></figure><figure><span id="net-b"></span><figcaption>Über einen Vermittler: <b id="cnt-b">5</b> Leitungen</figcaption></figure></div>
+  <div class="merke"><strong>Idee von MQTT</strong>Alle Geräte reden nur mit einem Vermittler, dem Broker. Kein Gerät muss die anderen kennen.</div>`,
+  after:()=>{const f=()=>{const n=+$('#nn').value;$('#nn-v').textContent=n;$('#net-a').innerHTML=netSVG(n,false);$('#net-b').innerHTML=netSVG(n,true);$('#cnt-a').textContent=n*(n-1)/2;$('#cnt-b').textContent=n;};$('#nn').addEventListener('input',f);f();}},
+ {html:()=>`<h2 id="in-title" tabindex="-1">Das Kanal-Prinzip</h2>
+  <p>Stell dir vor, du abonnierst einen Kanal in einem Messenger. Jede neue Nachricht dort landet bei dir. Wer sie schreibt, weiß nicht, wer mitliest. Genau so arbeitet MQTT.</p>
+  <div class="flow"><div class="bx"><b>Publisher</b>sendet zu einem Thema</div><span class="ar" aria-hidden="true">›</span><div class="bx br"><b>Broker</b>verteilt</div><span class="ar" aria-hidden="true">›</span><div class="bx"><b>Subscriber</b>hat das Thema abonniert</div></div>
+  <p><b>Denk-Impuls:</b> Was passiert, wenn jemand eine Nachricht zu einem Thema sendet, das <u>niemand</u> abonniert hat?</p>
+  <div class="opts" id="pred">${Object.entries(PRED).map(([k,v])=>`<label><input type="radio" name="pred" value="${k}" ${S.pred===k?'checked':''}><span>${v}</span></label>`).join('')}</div>
+  <p class="muted" id="pred-msg">${S.pred?'Gut, schreib dir deine Vermutung auf. Mission 2 prüft sie.':'Tippe eine Vermutung an. Es gibt noch keine falsche Antwort.'}</p>`,
+  after:()=>{$$('#pred input').forEach(i=>i.addEventListener('change',()=>{S.pred=i.value;$('#pred-msg').textContent='Gut, schreib dir deine Vermutung auf. Mission 2 prüft sie.';}));}},
+ {html:()=>`<h2 id="in-title" tabindex="-1">Thema und Inhalt einer Nachricht</h2>
+  <p>Jede Nachricht hat ein <b>Thema</b> (wie eine Adresse mit Ebenen) und einen <b>Inhalt</b>. Tippe auf die Teile.</p>
+  <div class="anat" role="group" aria-label="Aufbau einer Nachricht">${ANAT.map((a,i)=>`<button data-i="${i}" aria-pressed="false">${a[0]}</button>${i<ANAT.length-1?'<span>/</span>':''}`).join('')}<button class="pl" data-i="4" aria-pressed="false">ein</button></div>
+  <div class="expl" id="expl" aria-live="polite">Tippe auf einen Teil des Themas oder auf den Inhalt „ein“.</div>
+  <p><b>Kleiner Check:</b> Auf welchem Thema meldet die Küchen-Lampe ihren Zustand zurück?</p>
+  <div class="opts" id="chk">${[['haus1/kueche/lampe/status',1],['haus1/lampe/kueche/set',0],['kueche/haus1/lampe',0]].map(([t,ok])=>`<label data-ok="${ok}"><input type="radio" name="chk"><code>${t}</code></label>`).join('')}</div>
+  <p class="muted" id="chk-msg"></p>`,
+  after:()=>{
+    $$('.anat button').forEach(b=>b.addEventListener('click',()=>{$$('.anat button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));const i=+b.dataset.i;$('#expl').textContent=i===4?'Payload (Inhalt): das, was wirklich übertragen wird. Hier der Befehl „ein“.':ANAT[i][1];}));
+    $$('#chk label').forEach(l=>l.addEventListener('click',()=>{const ok=l.dataset.ok==='1';$$('#chk label').forEach(x=>x.classList.remove('ok','no'));l.classList.add(ok?'ok':'no');$('#chk-msg').textContent=ok?'Richtig: Raum, Gerät, dann „status“ für die Rückmeldung.':'Nicht ganz. Das Thema läuft vom Haus über den Raum zum Gerät und endet mit der Art der Nachricht.';}));
+  }},
+ {html:()=>`<h2 id="in-title" tabindex="-1">So arbeitest du im Labor</h2>
+  <p>Auf der Bühne siehst du drei Bereiche. Jede Nachricht fliegt als farbiges Paket von links nach rechts oder zurück.</p>
+  <div class="flow" style="grid-template-columns:1fr 1fr 1fr"><div class="bx"><b>Smartphone</b>Publisher: sendet Befehle und zeigt Rückmeldungen</div><div class="bx br"><b>Broker</b>zeigt, an wie viele Abonnenten verteilt wird</div><div class="bx"><b>Haus</b>Geräte abonnieren Befehle und melden ihren Zustand</div></div>
+  <div class="legend" style="margin:6px 0"><span><i class="lg-cmd"></i>Befehl</span><span><i class="lg-status"></i>Status</span><span><i class="lg-sens"></i>Messwert</span><span><i class="lg-will"></i>Last Will, Angriff</span></div>
+  <p>Oben auf der Seite steht immer die aktuelle Mission. Ein gelber Rahmen zeigt dir, wo du anfangen kannst. Unten findest du Werkzeuge wie den Mitschnitt und die Begriffe.</p>
+  <div class="merke"><strong>Tipp</strong>Aktiviere „Zeitlupe“, um jedes Paket in Ruhe zu verfolgen.</div>`,
+  after:()=>{}}
+];
+let istep=0;
+function renderIntro(){
+  const s=STEPS[istep];$('#in-body').innerHTML=s.html();s.after();
+  $('#in-dots').innerHTML=STEPS.map((_,i)=>`<i class="${i===istep?'on':i<istep?'past':''}"></i>`).join('');
+  $('#in-back').hidden=istep===0;$('#in-skip').hidden=istep===STEPS.length-1;
+  $('#in-next').textContent=istep===STEPS.length-1?'Mission 1 starten':'Weiter';
+  const hd=$('#in-title');if(hd)hd.focus({preventScroll:true});
+}
+function openIntro(){
+  istep=0;renderIntro();
+  if(introEl.showModal){if(!introEl.open)introEl.showModal();}else introEl.setAttribute('open','');
+}
+function closeIntro(){
+  try{localStorage.setItem('mqttlab.intro','1');}catch(e){}
+  if(introEl.close)introEl.close();else introEl.removeAttribute('open');
+  window.scrollTo({top:Math.max(0,$('#stage').getBoundingClientRect().top+scrollY-12),behavior:reduceMotion?'auto':'smooth'});
+}
+$('#in-next').addEventListener('click',()=>{if(istep===STEPS.length-1)closeIntro();else{istep++;renderIntro();}});
+$('#in-back').addEventListener('click',()=>{if(istep>0){istep--;renderIntro();}});
+$('#in-skip').addEventListener('click',closeIntro);
+introEl.addEventListener('close',()=>{try{localStorage.setItem('mqttlab.intro','1');}catch(e){}});
+$('#intro-btn').addEventListener('click',openIntro);
+
+/* ---------- Verbindungslinien ---------- */
+function drawLinks(){
+  const svg=$('#links'),st=$('#stage').getBoundingClientRect();
+  svg.setAttribute('viewBox',`0 0 ${st.width} ${st.height}`);
+  const p=centerOf($('#phone')),b=centerOf(brokerEl),h=centerOf($('#house'));
+  svg.innerHTML=`<line x1="${p.x}" y1="${p.y}" x2="${b.x}" y2="${b.y}"/><line x1="${b.x}" y1="${b.y}" x2="${h.x}" y2="${h.y}"/>`;
+}
+if(window.ResizeObserver){new ResizeObserver(drawLinks).observe($('#stage'));}
+window.addEventListener('resize',drawLinks);
+
+/* ---------- Uhr ---------- */
+function tick(){$('#clock').textContent=new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});}
+tick();setInterval(tick,30000);
+
+/* ---------- Start ---------- */
+async function boot(){
+  DEV.forEach(d=>{if(d.state)setDevState(d,d.state);});
+  refreshPrefixUI();renderMissions();renderAll();renderLog();drawLinks();
+  const dc=DEV.map(d=>clients[d.id]);
+  await Promise.all(dc.map((c,i)=>sleep(i*140).then(()=>connect(c))));
+  await sleep(500);
+  await connect(phone);
+  drawLinks();
+}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(drawLinks);
+boot();
+try{if(!localStorage.getItem('mqttlab.intro'))openIntro();}catch(e){openIntro();}
+})();
+</script>
+</body>
+</html>
