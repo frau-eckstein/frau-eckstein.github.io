@@ -1,0 +1,402 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Verkettung von Funktionen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: schmale Lesespalte, pro Teilaufgabe eine ruhige Karte mit zwei aufklappbaren Bereichen (Tipp, Lösung) */
+:root {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --fg: #1c2733;
+  --muted: #596779;
+  --line: #dce2ea;
+  --accent: #2b6b8a;
+  --accent-soft: #e3eff5;
+  --accent-fg: #ffffff;
+  --tip-bg: #fbf4e2;
+  --tip-fg: #6f4f0f;
+  --tip-line: #ecdcae;
+  --inner: #b4530a;
+  --inner-bg: rgba(214, 110, 20, .13);
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Figtree", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12181f; --surface: #1a222b; --fg: #e5eaf0; --muted: #9aa7b6; --line: #2a3541;
+    --accent: #72b8d6; --accent-soft: #1b3341; --accent-fg: #0f1a21;
+    --tip-bg: #2b2616; --tip-fg: #e2c47e; --tip-line: #493f22; --inner: #f2a65a; --inner-bg: rgba(242, 166, 90, .17);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12181f; --surface: #1a222b; --fg: #e5eaf0; --muted: #9aa7b6; --line: #2a3541;
+  --accent: #72b8d6; --accent-soft: #1b3341; --accent-fg: #0f1a21;
+  --tip-bg: #2b2616; --tip-fg: #e2c47e; --tip-line: #493f22; --inner: #f2a65a; --inner-bg: rgba(242, 166, 90, .17);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.6;
+  padding-block: 32px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 760px; margin: 0 auto; }
+h1, h2 { font-family: var(--font-display); text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(1.9rem, 5vw, 2.6rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.5rem; font-weight: 600; }
+.eyebrow { font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin: 0 0 10px; }
+.lead { color: var(--muted); margin: 14px 0 0; max-width: 62ch; }
+math { font-size: 1.12em; }
+math[display="block"] { margin: .55em 0; }
+/* innere Funktion: wird per \I{...} markiert (KaTeX setzt dafür mathcolor #c2570c) */
+mstyle[mathcolor="#c2570c"] { color: var(--inner); background: var(--inner-bg); border-radius: 3px; padding: 0 .12em; }
+
+.intro {
+  margin-top: 28px; padding: 18px 20px; background: var(--accent-soft);
+  border-radius: 10px; display: grid; gap: 6px;
+}
+.intro strong { font-family: var(--font-display); font-weight: 600; }
+.intro p { margin: 0; }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; align-items: center; }
+.toolbar .sp { flex: 1 1 20px; }
+.chip {
+  font: inherit; font-size: .92rem; font-weight: 500; text-decoration: none; cursor: pointer;
+  color: var(--fg); background: var(--surface); border: 1px solid var(--line);
+  padding: 7px 14px; border-radius: 999px;
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+.chip.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.chip.primary:hover { color: var(--accent-fg); opacity: .9; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+section.task { margin-top: 56px; scroll-margin-top: 16px; }
+.task-head { display: flex; gap: 14px; align-items: baseline; }
+.task-no { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; color: var(--accent); }
+.task-text { margin: 10px 0 0; color: var(--fg); }
+.parts { display: grid; gap: 14px; margin-top: 20px; }
+
+.part { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; min-width: 0; }
+.part-head { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.lbl { font-family: var(--font-display); font-weight: 700; color: var(--accent); min-width: 1.6em; }
+.given { display: flex; flex-wrap: wrap; gap: 6px 28px; min-width: 0; }
+.part-body { display: grid; gap: 10px; margin-top: 12px; }
+
+details { border-radius: 8px; min-width: 0; }
+summary {
+  list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 8px; font-weight: 600; font-size: .95rem; user-select: none;
+}
+summary::-webkit-details-marker { display: none; }
+summary::before {
+  content: ""; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg); transition: transform .15s ease; flex: none; margin-left: 2px;
+}
+details[open] > summary::before { transform: rotate(45deg); }
+.t-hide { display: none; }
+details[open] > summary .t-show { display: none; }
+details[open] > summary .t-hide { display: inline; }
+
+details.sol { border: 1px solid var(--line); }
+details.sol > summary { color: var(--accent); background: var(--accent-soft); }
+details.sol[open] > summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+details.tip { background: var(--tip-bg); border: 1px solid var(--tip-line); }
+details.tip > summary { color: var(--tip-fg); }
+.tip-inner { padding: 2px 14px 12px 31px; color: var(--tip-fg); }
+.tip-inner p { margin: 0; }
+.sol-inner { padding: 6px 16px 14px; }
+
+ol.steps { list-style: none; counter-reset: s; margin: 10px 0 0; padding: 0; display: grid; gap: 12px; }
+ol.steps > li { counter-increment: s; position: relative; padding-left: 36px; min-width: 0; overflow-x: auto; }
+ol.steps > li::before {
+  content: counter(s); position: absolute; left: 0; top: 2px; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent); font-size: .8rem; font-weight: 600;
+  display: grid; place-items: center;
+}
+.answer {
+  margin-top: 14px; padding: 10px 16px; border-left: 3px solid var(--accent);
+  background: var(--accent-soft); border-radius: 0 8px 8px 0; overflow-x: auto;
+}
+.answer .k { font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; color: var(--accent); display: block; }
+.variants { display: grid; gap: 14px; margin-top: 10px; }
+.variant { border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; overflow-x: auto; }
+.variant h4 { margin: 0 0 2px; font-family: var(--font-display); font-size: 1rem; font-weight: 600; }
+.variant .why { color: var(--muted); font-size: .94rem; margin: 0; }
+.variant .row { display: flex; flex-wrap: wrap; gap: 4px 28px; margin-top: 6px; }
+.check { color: var(--muted); font-size: .92rem; margin-top: 4px; }
+footer { margin-top: 56px; color: var(--muted); font-size: .88rem; }
+@media (prefers-reduced-motion: reduce) { summary::before { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Mathematik 12 · Verkettung von Funktionen</p>
+    <h1>Verkettung von Funktionen</h1>
+    <p class="lead">Aufgaben 1 bis 3 mit ausführlichen Musterlösungen.<br>Versuche jede Teilaufgabe zuerst selbst, öffne bei Bedarf den Tipp und prüfe dann deine Lösung.</p>
+
+    <div class="intro">
+      <p><strong>Schreibweise:</strong><br>$u(\I{v(x)})$ liest man „$u$ von $v$ von $x$“, kurz auch $(u\circ v)(x)$.</p>
+      <p><strong>Reihenfolge:</strong><br>$\I{v}$ ist die <em>innere</em> Funktion und wird zuerst angewendet, danach folgt die <em>äußere</em> Funktion $u$.</p>
+    </div>
+
+    <div class="toolbar">
+      <a class="chip" href="#pflicht">Pflichtaufgaben</a>
+      <a class="chip" href="#aufgabe-1">Aufgabe 1</a>
+      <a class="chip" href="#aufgabe-2">Aufgabe 2</a>
+      <a class="chip" href="#aufgabe-3">Aufgabe 3</a>
+      <span class="sp"></span>
+      <button class="chip primary" type="button" id="open-all">Alles öffnen</button>
+      <button class="chip" type="button" id="close-all">Alles schließen</button>
+    </div>
+  </header>
+
+  <main id="tasks"></main>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>
+(function () {
+  var T = String.raw;
+
+  /* ---------- Bausteine ---------- */
+  function ol(items) {
+    return '<ol class="steps">' + items.map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ol>';
+  }
+  function answer(html) {
+    return '<div class="answer"><span class="k">Ergebnis</span>' + html + '</div>';
+  }
+  function tip(html) {
+    return '<details class="tip"><summary><span class="t-show">Tipp anzeigen</span><span class="t-hide">Tipp ausblenden</span></summary><div class="tip-inner"><p>' + html + '</p></div></details>';
+  }
+  function sol(inner) {
+    return '<details class="sol"><summary><span class="t-show">Lösung anzeigen</span><span class="t-hide">Lösung ausblenden</span></summary><div class="sol-inner">' + inner + '</div></details>';
+  }
+  function part(label, given, tipHtml, solHtml) {
+    return '<article class="part"><div class="part-head"><span class="lbl">' + label + ')</span><div class="given">' + given + '</div></div>' +
+      '<div class="part-body">' + (tipHtml ? tip(tipHtml) : '') + sol(solHtml) + '</div></article>';
+  }
+  function task(id, no, title, text, tipHtml, parts) {
+    return '<section class="task" id="aufgabe-' + id + '"><div class="task-head"><span class="task-no">' + no + '</span><h2>' + title + '</h2></div>' +
+      '<p class="task-text">' + text + '</p>' +
+      (tipHtml ? '<div style="margin-top:12px">' + tip(tipHtml) + '</div>' : '') +
+      '<div class="parts">' + parts.join('') + '</div></section>';
+  }
+
+  /* ---------- Aufgabe 1 ---------- */
+  function strip(s) {
+    var m;
+    while ((m = s.indexOf('\\I{')) >= 0) {
+      var i = m + 3, d = 1;
+      while (i < s.length && d > 0) { if (s[i] === '{') d++; else if (s[i] === '}') d--; i++; }
+      s = s.slice(0, m) + s.slice(m + 3, i - 1) + s.slice(i);
+    }
+    return s;
+  }
+  function mk1(a) {
+    var steps = [
+      T`<b>Verkettung $f$:</b> Hier steht $\I{v}$ innen. Ersetze in $u(x)=` + a.U + T`$ jedes $x$ durch den Term $v(x)=\I{` + a.V + T`}$ (am besten in Klammern):` +
+        T`$$f(x)=u(\I{v(x)})=u(\I{` + a.V + T`})=` + a.fSub + (a.fRes ? T`=` + a.fRes : '') + T`$$` + (a.fNote ? '<span class="check">' + a.fNote + '</span>' : ''),
+      T`<b>Verkettung $g$:</b> Nun steht $\I{u}$ innen. Ersetze in $v(x)=` + a.V + T`$ jedes $x$ durch $u(x)=\I{` + a.U + T`}$:` +
+        T`$$g(x)=v(\I{u(x)})=v(\I{` + a.U + T`})=` + a.gSub + (a.gRes ? T`=` + a.gRes : '') + T`$$` + (a.gNote ? '<span class="check">' + a.gNote + '</span>' : '')
+    ];
+    return ol(steps) + answer(T`$f(x)=` + strip(a.fRes || a.fSub) + T`$ &nbsp;und&nbsp; $g(x)=` + strip(a.gRes || a.gSub) + T`$`);
+  }
+  function given1(U, V) { return T`<span>$u(x)=` + U + T`$</span><span>$v(x)=` + V + T`$</span>`; }
+
+  var t1 = task(1, '1', 'Verkettungen bilden',
+    T`Bilden Sie die Verkettungen $f$ mit $f(x)=u(v(x))$ und $g$ mit $g(x)=v(u(x))$.`,
+    T`Bei $u(v(x))$ steht $v$ innen. Schreibe die Rechenvorschrift von $u$ hin und ersetze jedes $x$ durch den <em>ganzen</em> Term $v(x)$, in Klammern. Bei $g$ tauschen $u$ und $v$ die Rollen. Du wirst sehen: Meistens gilt $f\neq g$.`,
+    [
+      part('a', given1(T`x-4`, T`x^2`), null, mk1({
+        U: T`x-4`, V: T`x^2`,
+        fSub: T`\I{x^2}-4`, fRes: null,
+        gSub: T`(\I{x-4})^2`, gRes: null,
+        gNote: T`Du kannst die Klammer mit der zweiten binomischen Formel auflösen: $(x-4)^2=x^2-8x+16$. Beides ist richtig.`
+      })),
+      part('b', given1(T`\E^x`, T`x+9`), null, mk1({
+        U: T`\E^x`, V: T`x+9`,
+        fSub: T`\E^{\I{x+9}}`, fRes: null,
+        gSub: T`\I{\E^x}+9`, gRes: null,
+        gNote: T`Achtung: $\E^{x}+9$ ist etwas anderes als $\E^{x+9}$. Die $9$ steht bei $g$ außerhalb des Exponenten.`
+      })),
+      part('c', given1(T`\cos(x)`, T`3x+7`), null, mk1({
+        U: T`\cos(x)`, V: T`3x+7`,
+        fSub: T`\cos(\I{3x+7})`, fRes: null,
+        gSub: T`3\cdot\I{\cos(x)}+7`, gRes: null,
+        gNote: T`Der Faktor $3$ multipliziert den ganzen Kosinuswert, es ist also nicht $\cos(3x)$.`
+      })),
+      part('d', given1(T`\dfrac{1}{x^2+1}`, T`1-x`),
+        T`Bei $f$ muss $(1-x)$ quadriert werden. Verwende dafür die zweite binomische Formel. Bei $g$ hilft es, die $1$ als $\frac{x^2+1}{x^2+1}$ zu schreiben.`,
+        mk1({
+          U: T`\dfrac{1}{x^2+1}`, V: T`1-x`,
+          fSub: T`\dfrac{1}{(\I{1-x})^2+1}`, fRes: T`\dfrac{1}{x^2-2x+2}`,
+          fNote: T`Nenner: $(1-x)^2+1=1-2x+x^2+1=x^2-2x+2$.`,
+          gSub: T`1-\I{\dfrac{1}{x^2+1}}`, gRes: T`\dfrac{x^2}{x^2+1}`,
+          gNote: T`Auf den Hauptnenner bringen: $1-\frac{1}{x^2+1}=\frac{x^2+1}{x^2+1}-\frac{1}{x^2+1}=\frac{x^2+1-1}{x^2+1}=\frac{x^2}{x^2+1}$.`
+        }))
+    ]);
+
+  /* ---------- Aufgabe 2 ---------- */
+  function mk2(a) {
+    var steps = [
+      T`<b>Innere Funktion finden:</b> ` + a.why + T`$$f(x)=` + a.fm + T`$$`,
+      T`<b>Funktionen festlegen:</b> Die zuerst berechnete Größe ist $v$, der Rest ist $u$, geschrieben mit der Variablen $x$:` +
+        T`$$v(x)=\I{` + a.V + T`}\qquad u(x)=` + a.U + T`$$`,
+      T`<b>Probe:</b> Setze $v(x)$ in $u$ ein:` + T`$$u(\I{v(x)})=u(\I{` + a.V + T`})=` + a.fm + T`=f(x)\ \checkmark$$` + (a.note ? '<span class="check">' + a.note + '</span>' : '')
+    ];
+    return ol(steps) + answer(T`$v(x)=\I{` + a.V + T`}$ &nbsp;und&nbsp; $u(x)=` + a.U + T`$`);
+  }
+  function givenF(f) { return T`<span>$f(x)=` + f + T`$</span>`; }
+
+  var t2 = task(2, '2', 'Funktionen u und v bestimmen',
+    T`Bestimmen Sie Funktionen $u$ und $v$ so, dass $f(x)=u(v(x))$ gilt.`,
+    T`Frage dich: Was wird beim Ausrechnen eines Funktionswerts <em>zuerst</em> berechnet? Das ist die innere Funktion $v$. Alles, was danach mit diesem Ergebnis passiert, gehört zu $u$. Faktoren und Vorzeichen vor der äußeren Funktion zählen zu $u$.`,
+    [
+      part('a', givenF(T`(x+5)^3`), null, mk2({
+        why: T`Zuerst wird $5$ zu $x$ addiert, danach wird das Ergebnis hoch $3$ genommen.`,
+        V: T`x+5`, U: T`x^3`, fm: T`(\I{x+5})^3`
+      })),
+      part('b', givenF(T`\E^{(x^2)}`), null, mk2({
+        why: T`Zuerst wird $x$ quadriert. Danach wird die Eulersche Zahl $\E$ mit diesem Ergebnis potenziert.`,
+        V: T`x^2`, U: T`\E^x`, fm: T`\E^{\I{x^2}}`
+      })),
+      part('c', givenF(T`\dfrac{1}{4x-1}`), null, mk2({
+        why: T`Zuerst wird der Nenner $4x-1$ berechnet. Danach wird davon der Kehrwert gebildet.`,
+        V: T`4x-1`, U: T`\dfrac{1}{x}`, fm: T`\dfrac{1}{\I{4x-1}}`
+      })),
+      part('d', givenF(T`2\sin(0{,}5x+1)`),
+        T`Die Reihenfolge ist: erst $0{,}5x+1$, dann Sinus, dann mal $2$. Wohin gehört also der Faktor $2$?`,
+        mk2({
+          why: T`Zuerst wird $0{,}5x+1$ berechnet, danach der Sinus gebildet und zuletzt mit $2$ multipliziert. Der Faktor $2$ gehört deshalb zur äußeren Funktion.`,
+          V: T`0{,}5x+1`, U: T`2\sin(x)`, fm: T`2\sin(\I{0{,}5x+1})`
+        })),
+      part('e', givenF(T`\E^{\frac{1}{x^2}}`), null, mk2({
+        why: T`Zuerst wird $\frac{1}{x^2}$ berechnet, danach wird $\E$ damit potenziert.`,
+        V: T`\dfrac{1}{x^2}`, U: T`\E^x`, fm: T`\E^{\I{\frac{1}{x^2}}}`,
+        note: T`Alternativ geht auch $v(x)=x^{-2}$, denn $\frac{1}{x^2}=x^{-2}$.`
+      })),
+      part('f', givenF(T`-\sin(\E^x)`),
+        T`Das Minuszeichen wird erst ganz am Ende angewendet, nachdem der Sinus berechnet wurde.`,
+        mk2({
+          why: T`Zuerst wird $\E^x$ berechnet, danach der Sinus gebildet und zuletzt das Vorzeichen gewechselt. Das Minus gehört zur äußeren Funktion.`,
+          V: T`\E^x`, U: T`-\sin(x)`, fm: T`-\sin(\I{\E^x})`
+        })),
+      part('g', givenF(T`\dfrac{4}{\cos(3x+2)}`),
+        T`Der Bruchstrich ist die letzte Rechenoperation. Was steht im Argument des Kosinus?`,
+        mk2({
+          why: T`Zuerst wird $3x+2$ berechnet, danach der Kosinus gebildet und zuletzt $4$ durch diesen Wert geteilt.`,
+          V: T`3x+2`, U: T`\dfrac{4}{\cos(x)}`, fm: T`\dfrac{4}{\cos(\I{3x+2})}`
+        })),
+      part('h', givenF(T`(\E^{2x}+7)^3`),
+        T`Der Term in der Klammer wird zuerst berechnet und anschließend hoch $3$ genommen.`,
+        mk2({
+          why: T`Zuerst wird die ganze Klammer $\E^{2x}+7$ berechnet, danach das Ergebnis hoch $3$ genommen.`,
+          V: T`\E^{2x}+7`, U: T`x^3`, fm: T`(\I{\E^{2x}+7})^3`,
+          note: T`Auch $\E^{2x}$ ist selbst verkettet (innen $2x$, außen $\E^x$). Hier genügen aber zwei Funktionen.`
+        }))
+    ]);
+
+  /* ---------- Aufgabe 3 ---------- */
+  function variant(n, desc, V, U, sub) {
+    return '<div class="variant"><h4>Möglichkeit ' + n + '</h4><p class="why">' + desc + '</p>' +
+      '<div class="row"><span>$v(x)=\\I{' + V + '}$</span><span>$u(x)=' + U + '$</span></div>' +
+      '<div class="check">Probe: $u(\\I{v(x)})=u(\\I{' + V + '})=' + sub + '\\ \\checkmark$</div></div>';
+  }
+  function mk3(v1, v2) {
+    return '<div class="variants">' + variant(1, v1[0], v1[1], v1[2], v1[3]) + variant(2, v2[0], v2[1], v2[2], v2[3]) + '</div>' +
+      answer(T`Zwei passende Zerlegungen: siehe Möglichkeit 1 und 2. Es gibt noch weitere.`);
+  }
+
+  var t3 = task(3, '3', 'Zwei verschiedene Zerlegungen',
+    T`Bestimmen Sie Funktionen $u$ und $v$ so, dass $f(x)=u(v(x))$ gilt. Finden Sie zwei verschiedene Möglichkeiten.`,
+    T`Die Zerlegung ist nicht eindeutig. Du kannst mehr oder weniger Rechenschritte in die innere Funktion $v$ packen. Wenn du dir den Term als Rechenkette vorstellst, darfst du die Kette an verschiedenen Stellen durchtrennen.`,
+    [
+      part('a', givenF(T`\dfrac{1}{2x^2+4}`),
+        T`Du kannst nach dem Quadrieren von $x$ „abschneiden“ oder erst den ganzen Nenner berechnen.`,
+        mk3(
+          ['Der gesamte Nenner ist die innere Funktion, außen bleibt nur der Kehrwert.', T`2x^2+4`, T`\dfrac{1}{x}`, T`\dfrac{1}{\I{2x^2+4}}`],
+          ['Nur das Quadrieren ist innen, der Rest des Terms wandert in die äußere Funktion.', T`x^2`, T`\dfrac{1}{2x+4}`, T`\dfrac{1}{2\I{x^2}+4}`]
+        )),
+      part('b', givenF(T`1-\E^{3x^2-x}`),
+        T`Du kannst nur den Exponenten innen lassen oder die gesamte Potenz $\E^{3x^2-x}$ als innere Funktion nehmen.`,
+        mk3(
+          ['Innen steht der Exponent, außen „$1$ minus e-Funktion“.', T`3x^2-x`, T`1-\E^x`, T`1-\E^{\I{3x^2-x}}`],
+          ['Innen steht die gesamte Potenz, außen wird sie nur von $1$ abgezogen.', T`\E^{3x^2-x}`, T`1-x`, T`1-\I{\E^{3x^2-x}}`]
+        )),
+      part('c', givenF(T`2(x+4)^2+4`),
+        T`Entweder steckt nur $x+4$ in $v$, oder bereits das Quadrat $(x+4)^2$.`,
+        mk3(
+          ['Innen steht die Klammer $x+4$, außen die quadratische Funktion mit Faktor und Summand.', T`x+4`, T`2x^2+4`, T`2(\I{x+4})^2+4`],
+          ['Innen steht das Quadrat der Klammer, außen eine lineare Funktion.', T`(x+4)^2`, T`2x+4`, T`2\cdot\I{(x+4)^2}+4`]
+        )),
+      part('d', givenF(T`(\sin(x)+5)^3-1`),
+        T`Das letzte Rechenzeichen ist das „$-1$“. Davor wird hoch $3$ genommen, davor $5$ addiert, davor der Sinus gebildet.`,
+        mk3(
+          ['Innen steht $\\sin(x)+5$, außen $x^3-1$.', T`\sin(x)+5`, T`x^3-1`, T`(\I{\sin(x)+5})^3-1`],
+          ['Innen steht nur der Sinus, außen alles Weitere.', T`\sin(x)`, T`(x+5)^3-1`, T`(\I{\sin(x)}+5)^3-1`]
+        )),
+      part('e', givenF(T`\E^{\cos(x)+1}`),
+        T`Die $+1$ im Exponenten kannst du entweder in $v$ oder in $u$ unterbringen.`,
+        mk3(
+          ['Der gesamte Exponent ist die innere Funktion.', T`\cos(x)+1`, T`\E^x`, T`\E^{\I{\cos(x)+1}}`],
+          ['Nur der Kosinus ist innen, das „$+1$“ steckt im Exponenten der äußeren Funktion.', T`\cos(x)`, T`\E^{x+1}`, T`\E^{\I{\cos(x)}+1}`]
+        )),
+      part('f', givenF(T`\sin(x^2-2x+4)`),
+        T`Entweder liegt das gesamte Argument des Sinus in $v$, oder du lässt die $+4$ in der äußeren Funktion.`,
+        mk3(
+          ['Das gesamte Argument des Sinus ist die innere Funktion.', T`x^2-2x+4`, T`\sin(x)`, T`\sin(\I{x^2-2x+4})`],
+          ['Die $+4$ wird in die äußere Funktion verschoben.', T`x^2-2x`, T`\sin(x+4)`, T`\sin(\I{x^2-2x}+4)`]
+        ))
+    ]);
+
+  document.getElementById('tasks').innerHTML = t1 + t2 + t3;
+
+  /* ---------- Pflichtaufgaben nach vorne holen ---------- */
+  (function () {
+    var tasksEl = document.getElementById('tasks');
+    var secs = tasksEl.querySelectorAll('section.task');
+    var picks = [[0, 2, '1 c)'], [2, 0, '3 a)'], [2, 4, '3 e)']];
+    var els = picks.map(function (p) { return secs[p[0]].querySelectorAll('.part')[p[1]]; });
+    var box = document.createElement('section');
+    box.className = 'task';
+    box.id = 'pflicht';
+    box.innerHTML = '<div class="task-head"><h2>Pflichtaufgaben</h2></div>' +
+      '<div class="parts"></div>';
+    var holder = box.querySelector('.parts');
+    els.forEach(function (el, i) {
+      el.querySelector('.lbl').textContent = picks[i][2];
+      holder.appendChild(el);
+    });
+    tasksEl.insertBefore(box, tasksEl.firstChild);
+  })();
+
+  /* ---------- Steuerung ---------- */
+  function setAll(open) {
+    document.querySelectorAll('details').forEach(function (d) { d.open = open; });
+  }
+  document.getElementById('open-all').addEventListener('click', function () { setAll(true); });
+  document.getElementById('close-all').addEventListener('click', function () { setAll(false); });
+
+  /* ---------- Formeln setzen (MathML, ohne externes Stylesheet) ---------- */
+  function typeset() {
+    if (typeof renderMathInElement !== 'function') return;
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true },
+        { left: '$', right: '$', display: false }
+      ],
+      macros: { '\\E': '\\mathrm{e}', '\\I': '\\textcolor{##c2570c}{#1}' },
+      output: 'mathml',
+      throwOnError: false
+    });
+  }
+  typeset();
+})();
+</script>
+
+</body></html>
