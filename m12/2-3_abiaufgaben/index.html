@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M12 – Abi-Tipps AB2-3</title>
+<link rel="stylesheet" href="_common/design.css">
+<style>
+  /* nur Layout */
+  .teil-frage { font-weight: 700; }
+  .teil > div > * + * { margin-top: .6rem; }
+  .level-koerper .hilfen { margin-top: .6rem; }
+</style>
+</head>
+<body data-thema="m12_ab2_3_abitipps">
+
+<header class="kopf">
+  <span class="kopf-kennung">Mathematik · Klasse 12 · AB2-3</span>
+  <h1>Vermischte Abituraufgaben<br><span class="akzent">mit Tipps, wenn Sie sie brauchen</span></h1>
+  <p class="kopf-unter">Erst selbst probieren, dann Tipp für Tipp aufklappen. Jeder Tipp ist erlaubt – je weniger Sie brauchen, desto näher sind Sie am Abi-Niveau.</p>
+</header>
+<div class="streifen"></div>
+
+<main class="inhalt">
+
+  <div class="auftrag">
+    <span class="icon icon--heft" aria-hidden="true"></span>
+    <p>Bearbeiten Sie die Aufgaben vom <strong>Arbeitsblatt AB2-3 „Vermischte Abituraufgaben“</strong> (zu 2.2 Kettenregel und 2.3 Produktregel) in Ihrem Übungsheft. Versuchen Sie es mindestens fünf Minuten allein, öffnen Sie dann immer nur <strong>einen</strong> Tipp und rechnen Sie selbst weiter. Das Ergebnis können Sie jederzeit zur Kontrolle aufklappen.</p>
+  </div>
+
+  <section class="fortschritt" aria-label="Ihr Fortschritt">
+    <div class="fortschritt-kopf">
+      <span class="fortschritt-titel">Ihr Fortschritt</span>
+      <span class="fortschritt-zahl" id="fortschritt-zahl">0 / 13 Aufgaben</span>
+    </div>
+    <div class="fortschritt-spur"><div class="fortschritt-fuellung" id="fortschritt-fuellung"></div></div>
+    <div class="fortschritt-fuss">
+      <nav class="level-nav" id="level-nav" aria-label="Zu einer Aufgabe springen">Springe zu</nav>
+    </div>
+  </section>
+
+  <!-- A1 -->
+  <section class="level" data-level="A1" id="a1">
+    <header class="level-kopf">
+      <div class="level-kopf-text">
+        <span class="level-marke">A1 · Abitur Bayern 2021</span>
+        <h2 class="level-titel">Sekante, Tangente und Parameter</h2>
+      </div>
+      <label class="erledigt"><input type="checkbox"> Geschafft!</label>
+    </header>
+    <div class="level-koerper">
+      <div class="teil"><span class="teil-buchstabe">a)</span><div>
+        <p class="teil-frage">Steigung m<sub>a</sub> der Geraden PQ<sub>a</sub></p>
+        <div class="hilfen">
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">Stellen Sie zuerst die Koordinaten von Q<sub>a</sub> auf: <span class="term">Q<sub>a</sub>(a | ⅛a³)</span>.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">Nutzen Sie die Steigungsformel <span class="term">m = <span class="bruch"><span>y₂ − y₁</span><span>x₂ − x₁</span></span></span> mit P(0 | 2) und Q<sub>a</sub>.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">Bringen Sie den Doppelbruch auf einen Bruchstrich: Zähler und Nenner mit 8 erweitern.</div></details>
+          <details class="hilfe hilfe--loesung"><summary><span class="icon icon--haken" aria-hidden="true"></span> Ergebnis</summary><div class="hilfe-inhalt">Passt zur Kontrolle: <span class="term">m<sub>a</sub> = <span class="bruch"><span>a³ − 16</span><span>8a</span></span></span></div></details>
+        </div>
+      </div></div>
+      <div class="teil"><span class="teil-buchstabe">b)</span><div>
+        <p class="teil-frage">Für welchen Wert von a verläuft die Tangente t<sub>a</sub> durch P?</p>
+        <div class="hilfen">
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">Die Tangente geht durch Q<sub>a</sub>. Wenn sie auch durch P geht, fallen Tangente und Gerade PQ<sub>a</sub> zusammen.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">Also muss die Steigung von f an der Stelle a genau m<sub>a</sub> sein: <span class="term">f′(a) = m<sub>a</sub></span>.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">Bilden Sie <span class="term">f′(x) = ⅜x²</span>, setzen Sie <span class="term">⅜a² = <span class="bruch"><span>a³ − 16</span><span>8a</span></span></span> und multiplizieren Sie mit 8a.</div></details>
+          <details class="hilfe hilfe--loesung"><summary><span class="icon icon--haken" aria-hidden="true"></span> Ergebnis</summary><div class="hilfe-inhalt"><span class="term">a = −2</span></div></details>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- A2 -->
+  <section class="level" data-level="A2" id="a2">
+    <header class="level-kopf">
+      <div class="level-kopf-text">
+        <span class="level-marke">A2 · Abitur Bayern 2021</span>
+        <h2 class="level-titel">Tangentengleichung beschreiben</h2>
+      </div>
+      <label class="erledigt"><input type="checkbox"> Geschafft!</label>
+    </header>
+    <div class="level-koerper">
+      <div class="teil"><span class="teil-buchstabe">a)</span><div>
+        <p class="teil-frage">Rechenweg für die Tangente im Punkt Q(2 | p(2))</p>
+        <div class="hilfen">
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">Eine Tangente ist eine Gerade: <span class="term">y = m · x + t</span>. Sie brauchen also m und t.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">m erhalten Sie über die Ableitung: <span class="term">m = p′(2)</span>.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">t erhalten Sie, indem Sie den Punkt Q(2 | p(2)) in <span class="term">y = mx + t</span> einsetzen. Schreiben Sie das in ganzen Sätzen auf – „beschreiben“ heißt erklären, nicht rechnen.</div></details>
+        </div>
+        <div class="box box--hinweis"><div class="box-titel"><span class="icon icon--info" aria-hidden="true"></span> Nachschlagen</div><p>Hilfe finden Sie auch im Arbeitsblatt „Tangente und Normale“.</p></div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- A3 -->
+  <section class="level" data-level="A3" id="a3">
+    <header class="level-kopf">
+      <div class="level-kopf-text">
+        <span class="level-marke">A3 · Abitur IQB 2021</span>
+        <h2 class="level-titel">Ableitung mit Parameter</h2>
+      </div>
+      <label class="erledigt"><input type="checkbox"> Geschafft!</label>
+    </header>
+    <div class="level-koerper">
+      <div class="teil"><span class="teil-buchstabe">a)</span><div>
+        <p class="teil-frage">Zeigen Sie: <span class="term">f′(x) = 2x · (2x² − k)</span></p>
+        <div class="hilfen">
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">k ist einfach eine Zahl – leiten Sie ganz normal mit Potenz-, Faktor- und Summenregel ab.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">Sie erhalten <span class="term">f′(x) = 4x³ − 2kx</span>. Jetzt fehlt nur noch ein Schritt …</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">Klammern Sie 2x aus.</div></details>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- A4 -->
+  <section class="level" data-level="A4" id="a4">
+    <header class="level-kopf">
+      <div class="level-kopf-text">
+        <span class="level-marke">A4 · Abitur IQB 2021</span>
+        <h2 class="level-titel">Tangentensteigung ablesen</h2>
+      </div>
+      <label class="erledigt"><input type="checkbox"> Geschafft!</label>
+    </header>
+    <div class="level-koerper">
+      <div class="teil"><span class="teil-buchstabe">a)</span><div>
+        <p class="teil-frage">Steigung der Tangente an G<sub>f</sub> im Punkt (0 | f(0))</p>
+        <div class="hilfen">
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">Achtung: In der Abbildung sind <strong>zwei</strong> Graphen. Welcher ist G<sub>f</sub>, welcher gehört zu f′?</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">Klassischer Weg: Zeichnen Sie die Tangente in (0 | f(0)) an G<sub>f</sub> und lesen Sie am Steigungsdreieck <span class="term">m = <span class="bruch"><span>Δy</span><span>Δx</span></span></span> ab.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">Schneller Weg: Die Tangentensteigung ist f′(0) – und der Graph von f′ ist abgebildet. Lesen Sie seinen Wert bei x = 0 ab.</div></details>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- A5 -->
+  <section class="level" data-level="A5" id="a5">
+    <header class="level-kopf">
+      <div class="level-kopf-text">
+        <span class="level-marke">A5 · Abitur Bayern 2020</span>
+        <h2 class="level-titel">Tangenten parallel zur Winkelhalbierenden</h2>
+      </div>
+      <label class="erledigt"><input type="checkbox"> Geschafft!</label>
+    </header>
+    <div class="level-koerper">
+      <div class="teil"><span class="teil-buchstabe">b)</span><div>
+        <p class="teil-frage">Stellen, an denen die Tangente parallel zu <span class="term">y = x</span> ist</p>
+        <div class="box box--achtung"><div class="box-titel"><span class="icon icon--warnung" aria-hidden="true"></span> Genau hinschauen</div><p>Abgebildet ist der Graph der <strong>Ableitung</strong> f′, nicht von f.</p></div>
+        <div class="hilfen">
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">Welche Steigung hat die Winkelhalbierende des I. und III. Quadranten? Parallele Geraden haben dieselbe Steigung.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">Gesucht sind also alle x mit <span class="term">f′(x) = 1</span>.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">Zeichnen Sie die waagrechte Gerade <span class="term">y = 1</span> ein und lesen Sie die x-Werte der Schnittpunkte mit dem Graphen ab.</div></details>
+          <details class="hilfe hilfe--loesung"><summary><span class="icon icon--haken" aria-hidden="true"></span> Selbstcheck</summary><div class="hilfe-inhalt">Es gibt <strong>zwei</strong> Stellen – eine zwischen 1 und 3, eine zwischen 6 und 8.</div></details>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- A6 -->
+  <section class="level" data-level="A6" id="a6">
+    <header class="level-kopf">
+      <div class="level-kopf-text">
+        <span class="level-marke">A6 · Abitur IQB 2020 · neu in 12</span>
+        <h2 class="level-titel">Stammfunktionen einer Funktionenschar</h2>
+      </div>
+      <label class="erledigt"><input type="checkbox"> Geschafft!</label>
+    </header>
+    <div class="level-koerper">
+      <div class="teil"><span class="teil-buchstabe">a)</span><div>
+        <p class="teil-frage">F ist eine Stammfunktion von f<sub>2</sub></p>
+        <div class="hilfen">
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">Stammfunktion heißt: <span class="term">F′(x) = f(x)</span>. Leiten Sie also F ab.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">Jetzt kennen Sie die <strong>Kettenregel</strong>: äußere Funktion <span class="term">½u⁴</span>, innere Funktion <span class="term">u = x − 2</span> mit innerer Ableitung 1.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">Vergleichen Sie Ihr Ergebnis mit <span class="term">f<sub>2</sub>(x) = 2 · (x − 2)³</span>.</div></details>
+        </div>
+      </div></div>
+      <div class="teil"><span class="teil-buchstabe">b)</span><div>
+        <p class="teil-frage">Für welche Werte von a gibt es Stammfunktionen mit nur negativen Funktionswerten?</p>
+        <div class="hilfen">
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">Alle Stammfunktionen von f<sub>a</sub> haben die Form <span class="term">F(x) = <span class="bruch"><span>a</span><span>4</span></span> · (x − 2)⁴ + c</span>.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">Skizzieren Sie: Wie sieht der Graph von <span class="term">(x − 2)⁴</span> aus? Was bewirkt das Vorzeichen von a, was bewirkt c?</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">„Nur negative Werte“ heißt: Der ganze Graph liegt unterhalb der x-Achse. Das geht nur, wenn er einen <strong>höchsten</strong> Punkt hat – den können Sie mit c nach unten schieben.</div></details>
+          <details class="hilfe hilfe--loesung"><summary><span class="icon icon--haken" aria-hidden="true"></span> Ergebnis</summary><div class="hilfe-inhalt">Für alle <span class="term">a &lt; 0</span> (dann z. B. mit <span class="term">c &lt; 0</span>).</div></details>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- A7 -->
+  <section class="level" data-level="A7" id="a7">
+    <header class="level-kopf">
+      <div class="level-kopf-text">
+        <span class="level-marke">A7 · Abitur Bayern 2019</span>
+        <h2 class="level-titel">Welcher Graph ist f′?</h2>
+      </div>
+      <label class="erledigt"><input type="checkbox"> Geschafft!</label>
+    </header>
+    <div class="level-koerper">
+      <div class="teil"><span class="teil-buchstabe">a)</span><div>
+        <p class="teil-frage">Graph I, II oder III?</p>
+        <div class="hilfen">
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">Wo hat G<sub>f</sub> waagrechte Tangenten (Steigung 0)? Genau dort muss der Graph von f′ Nullstellen haben.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">Betrachten Sie zusätzlich f′(0): Zeichnen Sie die Tangente an G<sub>f</sub> im Ursprung ein und bestimmen Sie ihre Steigung m.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">Für die Begründung reicht pro „falschem“ Graphen <strong>ein</strong> Argument, das nicht passt (Nullstellen oder Wert bei x = 0).</div></details>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- A8 -->
+  <section class="level" data-level="A8" id="a8">
+    <header class="level-kopf">
+      <div class="level-kopf-text">
+        <span class="level-marke">A8 · Abitur IQB 2019</span>
+        <h2 class="level-titel">Schnittpunkte und kleinste Steigung</h2>
+      </div>
+      <label class="erledigt"><input type="checkbox"> Geschafft!</label>
+    </header>
+    <div class="level-koerper">
+      <div class="teil"><span class="teil-buchstabe">a)</span><div>
+        <p class="teil-frage">Schnittpunkte mit der Geraden <span class="term">y = 1</span></p>
+        <div class="hilfen">
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">Schneiden heißt <strong>gleichsetzen</strong>: <span class="term">f(x) = 1</span>.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">Die +1 fällt auf beiden Seiten weg. Was können Sie jetzt ausklammern?</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">Satz vom Nullprodukt: <span class="term">x · (⅓x² − <span class="bruch"><span>4</span><span>3</span></span>) = 0</span>.</div></details>
+          <details class="hilfe hilfe--loesung"><summary><span class="icon icon--haken" aria-hidden="true"></span> Ergebnis</summary><div class="hilfe-inhalt"><span class="term">x₁ = −2, x₂ = 0, x₃ = 2</span></div></details>
+        </div>
+      </div></div>
+      <div class="teil"><span class="teil-buchstabe">b)</span><div>
+        <p class="teil-frage">Tangente mit der kleinsten Steigung</p>
+        <div class="hilfen">
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">Steigung = Ableitung. Berechnen Sie f′(x).</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">Der Graph von f′ ist eine nach oben geöffnete Parabel. Wo hat sie ihren tiefsten Punkt?</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">Alternativ: Die kleinste Steigung liegt im Wendepunkt – lösen Sie <span class="term">f″(x) = 0</span> und setzen Sie in f′ ein.</div></details>
+          <details class="hilfe hilfe--loesung"><summary><span class="icon icon--haken" aria-hidden="true"></span> Ergebnis</summary><div class="hilfe-inhalt">Kleinste Steigung <span class="term">−<span class="bruch"><span>4</span><span>3</span></span></span> an der Stelle <span class="term">x = 0</span></div></details>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- A9 -->
+  <section class="level" data-level="A9" id="a9">
+    <header class="level-kopf">
+      <div class="level-kopf-text">
+        <span class="level-marke">A9 · Abitur Bayern 2018</span>
+        <h2 class="level-titel">Eigenschaften nachweisen</h2>
+      </div>
+      <label class="erledigt"><input type="checkbox"> Geschafft!</label>
+    </header>
+    <div class="level-koerper">
+      <p class="teil-frage">Drei Eigenschaften von f nachweisen</p>
+      <div class="hilfen">
+        <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">Steigung heißt Ableitung. Bilden Sie zuerst f′(x). Damit ist (1) schnell erledigt: f′(0) = ?</div></details>
+        <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">(2) Die x-Achse hat die Steigung 0, und jeder Punkt auf ihr hat den y-Wert 0. Zeigen Sie also <span class="term">f(5) = 0</span> <strong>und</strong> <span class="term">f′(5) = 0</span>.</div></details>
+        <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">(3) Bestimmen Sie <span class="term">m = f′(−1)</span> und den Punkt B und stellen Sie die Tangente auf – oder prüfen Sie, ob B auf <span class="term">y = −36x − 36</span> liegt und die Steigung passt.</div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- A10 -->
+  <section class="level" data-level="A10" id="a10">
+    <header class="level-kopf">
+      <div class="level-kopf-text">
+        <span class="level-marke">A10 · Abitur Bayern 2016</span>
+        <h2 class="level-titel">Graph mit Knick skizzieren</h2>
+      </div>
+      <label class="erledigt"><input type="checkbox"> Geschafft!</label>
+    </header>
+    <div class="level-koerper">
+      <p class="teil-frage">Graph mit vorgegebenen Eigenschaften skizzieren</p>
+      <div class="hilfen">
+        <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">„Nur bei x = 3 nicht differenzierbar“ heißt: Dort hat der Graph einen <strong>Knick</strong>, sonst ist er überall glatt.</div></details>
+        <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt"><span class="term">f(0) = 2</span> bedeutet: Der Punkt P(0 | 2) liegt auf dem Graphen.</div></details>
+        <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt"><span class="term">f′(0) = −1</span>: Zeichnen Sie durch P eine kurze Tangente mit Steigung −1 und lassen Sie den Graphen dort anschmiegen.</div></details>
+        <details class="hilfe hilfe--loesung"><summary><span class="icon icon--haken" aria-hidden="true"></span> Selbstcheck</summary><div class="hilfe-inhalt">Geht der Graph durch (0 | 2)? Hat er dort die Steigung −1? Hat er genau bei x = 3 einen Knick – und sonst keine Ecken?</div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- A11 -->
+  <section class="level" data-level="A11" id="a11">
+    <header class="level-kopf">
+      <div class="level-kopf-text">
+        <span class="level-marke">A11 · Abitur Bayern 2016</span>
+        <h2 class="level-titel">Graph der Ableitung skizzieren</h2>
+      </div>
+      <label class="erledigt"><input type="checkbox"> Geschafft!</label>
+    </header>
+    <div class="level-koerper">
+      <p class="teil-frage">Graph von k′ skizzieren</p>
+      <div class="hilfen">
+        <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">Laut Hinweis hat G<sub>k</sub> im Wendepunkt (0 | −3) die stärkste negative Steigung. Zeichnen Sie dort die Tangente ein und bestimmen Sie ihre Steigung mit einem Steigungsdreieck. Das ist der <strong>tiefste</strong> Punkt des Graphen von k′.</div></details>
+        <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">Wo hat G<sub>k</sub> eine waagrechte Tangente? Dort liegt die Nullstelle von k′ (ungefähr bei x = 1).</div></details>
+        <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">Ganz links wird G<sub>k</sub> fast waagrecht, also nähert sich k′ der 0. Ganz rechts wird G<sub>k</sub> sehr steil, also wird k′ sehr groß.</div></details>
+        <details class="hilfe hilfe--loesung"><summary><span class="icon icon--haken" aria-hidden="true"></span> Selbstcheck</summary><div class="hilfe-inhalt">k′ &lt; 0 links von der Nullstelle, k′ &gt; 0 rechts davon, kleinster Wert von k′ bei x = 0.</div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- A12 -->
+  <section class="level" data-level="A12" id="a12">
+    <header class="level-kopf">
+      <div class="level-kopf-text">
+        <span class="level-marke">A12 · Abitur Bayern 2014 · neu in 12</span>
+        <h2 class="level-titel">Graph einer Stammfunktion</h2>
+      </div>
+      <label class="erledigt"><input type="checkbox"> Geschafft!</label>
+    </header>
+    <div class="level-koerper">
+      <div class="teil"><span class="teil-buchstabe">a)</span><div>
+        <p class="teil-frage">Verlauf einer Stammfunktion für a ≤ x ≤ b</p>
+        <div class="hilfen">
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">Stammfunktion heißt <span class="term">F′ = f</span>. Der gegebene Graph zeigt also die <strong>Steigung</strong> von F.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">Achten Sie auf das Vorzeichen von f zwischen a und b: Ist f &gt; 0, steigt F. Ist f &lt; 0, fällt F.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">Und was passiert mit F an der Stelle, an der f sein Vorzeichen wechselt?</div></details>
+        </div>
+      </div></div>
+      <div class="teil"><span class="teil-buchstabe">b)</span><div>
+        <p class="teil-frage">Stammfunktion im ganzen Bereich skizzieren</p>
+        <div class="hilfen">
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">Nullstellen von f sind Stellen mit waagrechter Tangente (Extrema) von F.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">Am Tiefpunkt von f fällt F am stärksten – dort hat F einen Wendepunkt.</div></details>
+          <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">Rechts ist f fast konstant und leicht negativ – dort fällt F fast wie eine Gerade.</div></details>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- A13 -->
+  <section class="level" data-level="A13" id="a13">
+    <header class="level-kopf">
+      <div class="level-kopf-text">
+        <span class="level-marke">A13 · Abitur Bayern 2012</span>
+        <h2 class="level-titel">Ableitungsgraph mit Randverhalten</h2>
+      </div>
+      <label class="erledigt"><input type="checkbox"> Geschafft!</label>
+    </header>
+    <div class="level-koerper">
+      <p class="teil-frage">Graph von f′ skizzieren</p>
+      <div class="hilfen">
+        <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 1</summary><div class="hilfe-inhalt">f′(0): Tangente im Ursprung einzeichnen und mit dem Steigungsdreieck einen Näherungswert bestimmen.</div></details>
+        <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 2</summary><div class="hilfe-inhalt">Der Hochpunkt von G<sub>f</sub> liefert die Nullstelle von f′.</div></details>
+        <details class="hilfe"><summary><span class="icon icon--gluehbirne" aria-hidden="true"></span> Tipp 3</summary><div class="hilfe-inhalt">Für x → 5 fällt G<sub>f</sub> immer steiler, fast senkrecht. Was heißt das für die Werte von f′?</div></details>
+        <details class="hilfe hilfe--loesung"><summary><span class="icon icon--haken" aria-hidden="true"></span> Selbstcheck</summary><div class="hilfe-inhalt">f′ fällt durchgehend, hat beim Hochpunkt von G<sub>f</sub> eine Nullstelle, und für x → 5 gilt f′(x) → −∞.</div></details>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="fuss">
+  <div class="fuss-zeile mono">M12 · 2 Natürliche Exponentialfunktion · AB2-3 Vermischte Abituraufgaben</div>
+  <div class="fuss-zeile">Ihr Fortschritt wird nur in diesem Browser gespeichert.</div>
+</footer>
+
+<script src="_common/lernseite.js"></script>
+<script>
+  /* Fortschrittsanzeige zählt Aufgaben statt Level */
+  (function () {
+    var z = document.getElementById('fortschritt-zahl');
+    if (!z) return;
+    function text() { if (z.textContent.indexOf('Level') > -1) z.textContent = z.textContent.replace('Level', 'Aufgaben'); }
+    new MutationObserver(text).observe(z, { childList: true, characterData: true, subtree: true });
+    text();
+  })();
+</script>
+</body>
+</html>
